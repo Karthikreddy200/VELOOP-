@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VELOOP Rewards — Internship Milestone: Days 1–3 Progress Report</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true, theme: 'neutral'});</script>
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --slate-800: #1e293b;
+    --slate-600: #475569;
+    --slate-100: #f1f5f9;
+    --slate-50: #f8fafc;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.65;
+    color: #1e293b;
+    background: #f1f5f9;
+    margin: 0;
+    padding: 30px 15px;
+  }
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: #ffffff;
+    padding: 50px 60px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  }
+  .header-banner {
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+  }
+  .badge-classification {
+    display: inline-block;
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    margin-bottom: 12px;
+    border: 1px solid #fde68a;
+  }
+  h1 {
+    color: #0f172a;
+    font-size: 26px;
+    margin-top: 0;
+    margin-bottom: 6px;
+    font-weight: 800;
+  }
+  h2 {
+    color: #1e293b;
+    font-size: 20px;
+    margin-top: 36px;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  h3 {
+    color: #334155;
+    font-size: 16px;
+    margin-top: 24px;
+    margin-bottom: 10px;
+  }
+  p, li {
+    color: #334155;
+    font-size: 14.5px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 22px 0;
+    font-size: 13px;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  th, td {
+    border: 1px solid #cbd5e1;
+    padding: 10px 14px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: #f8fafc;
+    color: #0f172a;
+    font-weight: 700;
+  }
+  tr:nth-child(even) {
+    background: #f8fafc;
+  }
+  code {
+    background: #f1f5f9;
+    color: #0f172a;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 12.5px;
+  }
+  pre {
+    background: #0f172a;
+    color: #f8fafc;
+    padding: 16px 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+  }
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+  }
+  .badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .badge-confirmed {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+  }
+  .badge-proposed {
+    background: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #bae6fd;
+  }
+  .badge-verify {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+  }
+  .badge-critical {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #f87171;
+  }
+  .badge-high {
+    background: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #fb923c;
+  }
+  .badge-medium {
+    background: #fefce8;
+    color: #854d0e;
+    border: 1px solid #facc15;
+  }
+  .alert {
+    padding: 14px 18px;
+    border-radius: 8px;
+    margin: 20px 0;
+    font-size: 13.5px;
+  }
+  .alert-important {
+    background: #fffbeb;
+    border-left: 4px solid #f59e0b;
+    color: #92400e;
+  }
+  .alert-note {
+    background: #eff6ff;
+    border-left: 4px solid #3b82f6;
+    color: #1e40af;
+  }
+  .mermaid {
+    text-align: center;
+    margin: 25px 0;
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+  }
+  .footer {
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+    font-size: 12px;
+    color: #64748b;
+    text-align: center;
+  }
+  @media print {
+    body { background: #fff; padding: 0; }
+    .container { box-shadow: none; padding: 0; max-width: 100%; }
+    .mermaid { break-inside: avoid; }
+    table { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header-banner">
+    <div class="badge-classification">SIMULATED DATA — CREATED FOR ANALYTICAL TESTING</div>
+    <h1>VELOOP REWARDS — DATA ANALYST INTERNSHIP</h1>
+    <div style="font-size: 16px; font-weight: 600; color: #475569;">TASK 01 PROGRESS REPORT: DAYS 1–3 DELIVERABLES</div>
+    <div style="font-size: 13px; color: #64748b; margin-top: 4px;">Schedule Reference: Section 31 (Product Discovery, Source Register, Data Audit & Coverage Matrix)</div>
+  </div>
+  <h1>VELOOP REWARDS DATA ANALYST INTERNSHIP</h1>
+<h2>MILESTONE PROGRESS REPORT: DAYS 1–3</h2>
+<p><strong>Schedule Reference:</strong> Section 31 (Days 1–3 of 22–25 Day Schedule — Phase 1 Discovery &amp; Data Audit)<br />
+<strong>Deliverables Covered:</strong><br />
+<em> </em><em>Days 1–2:</em><em> Product Documentation Review &amp; Source &amp; Verification Register (Deliverable 21a)<br />
+</em> <strong>Day 3:</strong> Work Package A — Product Data Readiness Audit &amp; Comprehensive Data Coverage Matrix (Deliverables 02 &amp; 03)<br />
+<strong>Classification:</strong> <code>SIMULATED DATA — CREATED FOR ANALYTICAL TESTING</code><br />
+<strong>Status Standard:</strong> <code>Confirmed</code> | <code>Proposed</code> | <code>To Be Verified</code><br />
+<strong>Author:</strong> Karthik Reddy, Data Analyst Intern — VELOOP Product Analytics<br />
+<strong>Date Submitted:</strong> November 4, 2026  </p>
+<hr />
+<h2>1. Executive Summary: Days 1–3 Progress</h2>
+<p>During the first 3 days of the VELOOP Rewards Data Analyst Internship, the technical and analytical foundation was established according to the official schedule:</p>
+<ol>
+<li><strong>Days 1–2 (Product Discovery &amp; Evidence Discipline):</strong> Systematically reviewed all product documentation across the 15 simulated product modules. Established the <strong>Source &amp; Verification Register</strong> (26 cataloged items across Confirmed, Proposed, and To Be Verified) and enforced the strict anti-assumption protocol mandated in Section 6.</li>
+<li><strong>Day 3 (Work Package A — Product Data Readiness Audit):</strong> Mapped user journeys against automated system decisions across all 15 features, established the strict <strong>3-Tier Delineation</strong> (User Events vs. System Events vs. Business Outcomes), constructed the <strong>Comprehensive Data Coverage Matrix</strong>, and identified the <strong>Top 10 Mission-Critical Analytics Gaps</strong> that currently compromise platform telemetry and financial reconciliation.</li>
+</ol>
+<div class="alert alert-important"><strong>IMPORTANT:</strong> **Data Authenticity Notice (Section 34):** In strict accordance with the non-negotiable integrity policy, all findings in this report are based on the initial product specification and simulated dataset (`VELOOP_Simulated_User_Behavior_1000.xlsx`). Simulated telemetry is strictly labeled as **SIMULATED DATA — CREATED FOR ANALYTICAL TESTING** and is never represented as actual proprietary company metrics.
+</div>
+<hr />
+<h2>2. Days 1–2 Foundational Recap: Scoping &amp; Source Register</h2>
+<h3>2.1 The 15 Functional Modules</h3>
+<p>A systematic audit of VELOOP's product context and simulated datasets (<code>03_Feature_Events</code>, <code>Users_1000_Clean</code>, <code>05_Task_Activity</code>) confirmed 15 functional modules:
+* <strong>Core Auth:</strong> User Registration, Login &amp; Session Management.
+* <strong>Earning Tasks:</strong> Watch Ads (Rewarded Video), Tap &amp; Earn, Mining Rewards, Missions, Follow &amp; Earn.
+* <strong>Gamification:</strong> Daily Rewards calendar, Streak Multipliers, Spin the Wheel (RNG), Badges &amp; Levels, Competitive Leaderboard.
+* <strong>Monetary &amp; Ledger:</strong> Wallet balances, Exchange Center, Withdrawals &amp; Payout Gateways.
+* <strong>Security &amp; Growth:</strong> CAPTCHA &amp; Bot Detection, Referral Viral Loops.</p>
+<div class="mermaid">flowchart TD
+    subgraph S1[&quot;1. Core &amp; Earning&quot;]
+        M1[&quot;Auth &amp; Profiles&quot;] --&gt; M2[&quot;Watch Ads &amp; Taps&quot;]
+        M2 --&gt; M3[&quot;Mining &amp; Missions&quot;]
+    end
+    subgraph S2[&quot;2. Gamification&quot;]
+        M4[&quot;Daily &amp; Streak Rewards&quot;] --&gt; M5[&quot;Wheel &amp; Badges&quot;]
+    end
+    subgraph S3[&quot;3. Financial &amp; Growth&quot;]
+        M6[&quot;Wallet &amp; Exchange&quot;] --&gt; M7[&quot;Withdrawals&quot;]
+        M7 --&gt; M8[&quot;Referrals &amp; Anti-Bot&quot;]
+    end
+    S1 --&gt; S2 --&gt; S3
+</div>
+<h3>2.2 Source &amp; Verification Register Summary (Deliverable 21a)</h3>
+<p>To ensure strict evidence discipline, 26 technical capabilities were cataloged:
+* 🟢 <strong>Confirmed (11 items):</strong> Factually observed in telemetry (35,704 clickstream events, 9,846 task records, 7,913 sessions).
+* 🔵 <strong>Proposed (8 items):</strong> Architected analytical models designed to solve unrecorded states (Double-entry ledger, 6-stage withdrawal machine, idempotency keys, SHA-256 PII masking).
+* 🔴 <strong>To Be Verified (7 items):</strong> Operational unknowns requiring backend engineering sign-off (Ad network HMAC signatures, real-time CDC event emission, payout webhooks, database constraints).</p>
+<hr />
+<h2>3. Day 3 Core Deliverable: Work Package A — Product Data Readiness Audit (Deliverable 02)</h2>
+<h3>3.1 A1. Product Area &amp; User Journey Mapping</h3>
+<table>
+<thead>
+<tr>
+<th>Product Area</th>
+<th>Feature / Module</th>
+<th>User Action</th>
+<th>System Outcome</th>
+<th>Data Required</th>
+<th>Business Question Addressed</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Account</strong></td>
+<td>Registration</td>
+<td>User submits form / SSO</td>
+<td>Account provisioned; confirmation sent</td>
+<td><code>user_id</code>, <code>reg_datetime</code>, <code>channel</code>, <code>device</code></td>
+<td>Which marketing channels yield active accounts?</td>
+<td><span class="badge badge-confirmed">Confirmed</span></td>
+</tr>
+<tr>
+<td><strong>Account</strong></td>
+<td>Login</td>
+<td>Submits credentials / biometrics</td>
+<td>Session token generated; JWT issued</td>
+<td><code>user_id</code>, <code>session_id</code>, <code>login_datetime</code></td>
+<td>What is our true DAU vs background refresh hits?</td>
+<td><span class="badge badge-confirmed">Confirmed</span></td>
+</tr>
+<tr>
+<td><strong>Earning</strong></td>
+<td>Watch Ads</td>
+<td>Taps ad card; views 30s video</td>
+<td>Ad impression verified; reward credited</td>
+<td><code>user_id</code>, <code>ad_unit_id</code>, <code>duration_sec</code>, <code>reward_id</code></td>
+<td>Which ad networks deliver completed views vs drop-offs?</td>
+<td><span class="badge badge-confirmed">Confirmed</span></td>
+</tr>
+<tr>
+<td><strong>Earning</strong></td>
+<td>Tap &amp; Earn</td>
+<td>Taps interactive screen canvas</td>
+<td>Tap counter incremented; anti-bot checked</td>
+<td><code>user_id</code>, <code>tap_count</code>, <code>duration_ms</code>, <code>multiplier</code></td>
+<td>What is the average session fatigue point for micro-tapping?</td>
+<td><span class="badge badge-confirmed">Confirmed</span></td>
+</tr>
+<tr>
+<td><strong>Earning</strong></td>
+<td>Mining Rewards</td>
+<td>Initiates mining session timer</td>
+<td>Cloud timer started; yield accumulated</td>
+<td><code>user_id</code>, <code>start_time</code>, <code>yield_rate</code>, <code>end_time</code></td>
+<td>Does passive earning drive sustained retention?</td>
+<td><span class="badge badge-confirmed">Confirmed</span></td>
+</tr>
+<tr>
+<td><strong>Earning</strong></td>
+<td>Missions</td>
+<td>Starts structured challenge</td>
+<td>Progress tracked; validation verified</td>
+<td><code>user_id</code>, <code>mission_id</code>, <code>criteria_met</code>, <code>xp_awarded</code></td>
+<td>Do structured missions improve Day-7 retention cohorts?</td>
+<td><span class="badge badge-confirmed">Confirmed</span></td>
+</tr>
+<tr>
+<td><strong>Earning</strong></td>
+<td>Follow &amp; Earn</td>
+<td>Taps social follow link</td>
+<td>S2S verification pinged; reward unlocked</td>
+<td><code>user_id</code>, <code>platform_name</code>, <code>target_account</code>, <code>status</code></td>
+<td>What is the conversion efficiency of social tasks?</td>
+<td><span class="badge badge-confirmed">Confirmed</span></td>
+</tr>
+<tr>
+<td><strong>Gamification</strong></td>
+<td>Spin the Wheel</td>
+<td>Taps spin button</td>
+<td>RNG algorithm assigns prize tier</td>
+<td><code>user_id</code>, <code>spin_id</code>, <code>prize_tier</code>, <code>reward_value</code></td>
+<td>Does daily wheel spinning stimulate core task adoption?</td>
+<td><span class="badge badge-confirmed">Confirmed</span></td>
+</tr>
+<tr>
+<td><strong>Gamification</strong></td>
+<td>Daily Rewards</td>
+<td>Claims calendar day reward</td>
+<td>Day counter incremented; streak evaluated</td>
+<td><code>user_id</code>, <code>calendar_day</code>, <code>streak_day_count</code>, <code>reward</code></td>
+<td>What percentage of users maintain unbroken 7-day habits?</td>
+<td><span class="badge badge-confirmed">Confirmed</span></td>
+</tr>
+<tr>
+<td><strong>Gamification</strong></td>
+<td>Streak Rewards</td>
+<td>Completes daily task to save streak</td>
+<td>Streak milestone unlocked; multiplier applied</td>
+<td><code>user_id</code>, <code>current_streak</code>, <code>longest_streak</code></td>
+<td>At what streak length does user drop-off peak?</td>
+<td><span class="badge badge-confirmed">Confirmed</span></td>
+</tr>
+<tr>
+<td><strong>Gamification</strong></td>
+<td>Badges &amp; Levels</td>
+<td>Accumulates XP progression</td>
+<td>Level incremented; cosmetic badge minted</td>
+<td><code>user_id</code>, <code>level_number</code>, <code>badge_id</code>, <code>total_xp</code></td>
+<td>Does status progression correlate with lower churn?</td>
+<td><span class="badge badge-confirmed">Confirmed</span></td>
+</tr>
+<tr>
+<td><strong>Gamification</strong></td>
+<td>Leaderboard</td>
+<td>Views global/regional rank</td>
+<td>Leaderboard rank served</td>
+<td><code>user_id</code>, <code>rank_position</code>, <code>cohort_id</code></td>
+<td>Does competitive ranking drive re-engagement?</td>
+<td><span class="badge badge-confirmed">Confirmed</span></td>
+</tr>
+<tr>
+<td><strong>Security</strong></td>
+<td>CAPTCHA</td>
+<td>Solves puzzle challenge</td>
+<td>Solution evaluated server-side</td>
+<td><code>user_id</code>, <code>challenge_id</code>, <code>latency_ms</code>, <code>passed_flag</code></td>
+<td>What is our true bot incidence rate across task attempts?</td>
+<td><span class="badge badge-confirmed">Confirmed</span></td>
+</tr>
+<tr>
+<td><strong>Monetary</strong></td>
+<td>Wallet</td>
+<td>Views balance &amp; transaction log</td>
+<td>Balance served from ledger</td>
+<td><code>user_id</code>, <code>xp_balance</code>, <code>token_balance</code></td>
+<td>How often do users check balances prior to cash-out?</td>
+<td><span class="badge badge-confirmed">Confirmed</span></td>
+</tr>
+<tr>
+<td><strong>Monetary</strong></td>
+<td>Exchange Center</td>
+<td>Swaps XP for convertible Tokens</td>
+<td>Debit XP, credit Token applied atomically</td>
+<td><code>exchange_id</code>, <code>user_id</code>, <code>xp_debited</code>, <code>tokens_credited</code></td>
+<td>What is internal currency velocity and preferred currency?</td>
+<td><span class="badge badge-proposed">Proposed</span></td>
+</tr>
+<tr>
+<td><strong>Monetary</strong></td>
+<td>Withdrawals</td>
+<td>Submits cash-out to gateway</td>
+<td>Hold placed; payout dispatched</td>
+<td><code>user_id</code>, <code>withdrawal_id</code>, <code>amount</code>, <code>method</code>, <code>status</code></td>
+<td>What is our payout completion rate and SLA turnaround?</td>
+<td><span class="badge badge-proposed">Proposed</span></td>
+</tr>
+<tr>
+<td><strong>Growth</strong></td>
+<td>Referrals</td>
+<td>Shares code / friend joins</td>
+<td>Attribution link created; bonus unlocked</td>
+<td><code>referrer_id</code>, <code>referee_id</code>, <code>code</code>, <code>status</code></td>
+<td>What is our viral coefficient ($K$) and referee activation rate?</td>
+<td><span class="badge badge-confirmed">Confirmed</span></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3>3.2 A2. User Action Flows &amp; Measurable Stage Decomposition</h3>
+<p>Every product journey must be broken into discrete user actions and system validation gates:</p>
+<h4>1. Task Earning Funnel</h4>
+<div class="mermaid">flowchart LR
+    A[1. Task Viewed] --&gt; B[2. Task Opened]
+    B --&gt; C[3. Task Started]
+    C --&gt; D[4. Task Completed]
+    D --&gt; E{5. System Validation}
+    E -- Passed --&gt; F[6. Reward Credited]
+    E -- Failed --&gt; G[Rejection Logged]
+</div>
+<h4>2. Withdrawal &amp; Payout Finite State Machine</h4>
+<div class="mermaid">flowchart LR
+    W1[1. Requested] --&gt; W2[2. Under Review]
+    W2 --&gt; W3[3. Processing]
+    W3 --&gt; W4[4. Completed]
+    W3 --&gt; W5[5. Rejected / Reversed]
+</div>
+<hr />
+<h3>3.3 A3. Strict 3-Tier Delineation: User Events vs. System Events vs. Business Outcomes</h3>
+<p>A fatal mistake in telemetry architecture is treating backend states or financial outcomes as client clicks. Section 7 strictly enforces a 3-tier boundary:</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Definition</th>
+<th>Examples</th>
+<th>Storage Producer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Tier 1: User Event</strong></td>
+<td>Explicit client-initiated action reflecting user intent and friction points.</td>
+<td><code>task_opened</code>, <code>ad_started</code>, <code>withdrawal_requested</code></td>
+<td><strong>Client Telemetry Stream</strong> (<code>fact_feature_events</code>)</td>
+</tr>
+<tr>
+<td><strong>Tier 2: System Event</strong></td>
+<td>Automated server-side decision, verification, or balance mutation executed by backend logic.</td>
+<td><code>task_validation_passed</code>, <code>reward_credited</code>, <code>withdrawal_completed</code></td>
+<td><strong>Transactional Event Store</strong> (<code>fact_wallet_transactions</code>)</td>
+</tr>
+<tr>
+<td><strong>Tier 3: Business Outcome</strong></td>
+<td>Macro financial or behavioral result derived from aggregated user and system events.</td>
+<td>Net User Retention (D7/D30), Net Payout Liability, Cost Per Acquisition</td>
+<td><strong>Warehouse Semantic Layer</strong> (dbt / KPI Dashboards)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>4. Day 3 Core Deliverable: Comprehensive Data Coverage Matrix (Deliverable 03)</h2>
+<table>
+<thead>
+<tr>
+<th>Product Area</th>
+<th>User Action</th>
+<th>System Action</th>
+<th>Business Outcome</th>
+<th>Data Required</th>
+<th>Proposed Event Name</th>
+<th>Producer</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Account</strong></td>
+<td>Signs up</td>
+<td>Validates form &amp; creates DB record</td>
+<td>New Registered User</td>
+<td><code>user_id</code>, <code>timestamp</code>, <code>channel</code>, <code>platform</code></td>
+<td><code>user_registered</code></td>
+<td>Backend Auth</td>
+<td><span class="badge badge-critical">Critical</span></td>
+</tr>
+<tr>
+<td><strong>Account</strong></td>
+<td>Logs in</td>
+<td>Issues JWT &amp; creates session</td>
+<td>Active Session / DAU</td>
+<td><code>user_id</code>, <code>session_id</code>, <code>timestamp</code></td>
+<td><code>user_logged_in</code></td>
+<td>Backend Auth</td>
+<td><span class="badge badge-critical">Critical</span></td>
+</tr>
+<tr>
+<td><strong>Tasks</strong></td>
+<td>Taps task card</td>
+<td>Queries task modal &amp; requirements</td>
+<td>Task Discovery / CTR</td>
+<td><code>user_id</code>, <code>task_id</code>, <code>task_type</code>, <code>category</code></td>
+<td><code>task_opened</code></td>
+<td>Frontend Client</td>
+<td><span class="badge badge-high">High</span></td>
+</tr>
+<tr>
+<td><strong>Tasks</strong></td>
+<td>Initiates task</td>
+<td>Sets in-progress state</td>
+<td>Earning Intent</td>
+<td><code>user_id</code>, <code>task_id</code>, <code>task_type</code>, <code>started_at</code></td>
+<td><code>task_started</code></td>
+<td>Frontend / Backend</td>
+<td><span class="badge badge-critical">Critical</span></td>
+</tr>
+<tr>
+<td><strong>Tasks</strong></td>
+<td>Submits completion</td>
+<td>Receives client proof/payload</td>
+<td>Completion Velocity</td>
+<td><code>user_id</code>, <code>task_id</code>, <code>duration_sec</code></td>
+<td><code>task_completed</code></td>
+<td>Frontend Client</td>
+<td><span class="badge badge-critical">Critical</span></td>
+</tr>
+<tr>
+<td><strong>Validation</strong></td>
+<td>N/A (Automated)</td>
+<td>Validates rules &amp; third-party proof</td>
+<td>Fraud Prevention</td>
+<td><code>task_id</code>, <code>user_id</code>, <code>risk_score</code>, <code>failure_code</code></td>
+<td><code>task_validation_passed</code></td>
+<td>Backend Rules</td>
+<td><span class="badge badge-critical">Critical</span></td>
+</tr>
+<tr>
+<td><strong>Rewards</strong></td>
+<td>N/A (Automated)</td>
+<td>Executes double-entry wallet credit</td>
+<td>Reward Distribution</td>
+<td><code>tx_id</code>, <code>user_id</code>, <code>amount</code>, <code>unit</code>, <code>source_id</code></td>
+<td><code>reward_credited</code></td>
+<td>Backend Wallet</td>
+<td><span class="badge badge-critical">Critical</span></td>
+</tr>
+<tr>
+<td><strong>Gamification</strong></td>
+<td>Claims daily reward</td>
+<td>Increments streak counter</td>
+<td>Day-N Habituation</td>
+<td><code>user_id</code>, <code>streak_day</code>, <code>reward_amount</code></td>
+<td><code>daily_reward_claimed</code></td>
+<td>Backend API</td>
+<td><span class="badge badge-high">High</span></td>
+</tr>
+<tr>
+<td><strong>Gamification</strong></td>
+<td>Spins wheel</td>
+<td>Computes server-side RNG prize</td>
+<td>Gamified Re-engagement</td>
+<td><code>user_id</code>, <code>spin_id</code>, <code>prize_tier</code>, <code>reward_value</code></td>
+<td><code>spin_completed</code></td>
+<td>Backend API</td>
+<td><span class="badge badge-medium">Medium</span></td>
+</tr>
+<tr>
+<td><strong>Withdrawals</strong></td>
+<td>Submits payout</td>
+<td>Places escrow hold on balance</td>
+<td>Liquidity Demand</td>
+<td><code>withdrawal_id</code>, <code>user_id</code>, <code>amount</code>, <code>method</code></td>
+<td><code>withdrawal_requested</code></td>
+<td>Backend Wallet</td>
+<td><span class="badge badge-critical">Critical</span></td>
+</tr>
+<tr>
+<td><strong>Withdrawals</strong></td>
+<td>Webhook callback</td>
+<td>Finalizes payout; updates balance</td>
+<td>Fulfilled Settlement</td>
+<td><code>withdrawal_id</code>, <code>settlement_time</code>, <code>fee</code></td>
+<td><code>withdrawal_completed</code></td>
+<td>Gateway Webhook</td>
+<td><span class="badge badge-critical">Critical</span></td>
+</tr>
+<tr>
+<td><strong>Withdrawals</strong></td>
+<td>Gateway failure / Ops</td>
+<td>Rejects request; refunds ledger</td>
+<td>Payout Failure SLA</td>
+<td><code>withdrawal_id</code>, <code>rejection_code</code>, <code>refund_tx_id</code></td>
+<td><code>withdrawal_rejected</code></td>
+<td>Gateway Webhook</td>
+<td><span class="badge badge-critical">Critical</span></td>
+</tr>
+<tr>
+<td><strong>Referrals</strong></td>
+<td>Shares code</td>
+<td>Generates tracking deep link</td>
+<td>Viral Organic Reach</td>
+<td><code>user_id</code>, <code>code</code>, <code>channel</code></td>
+<td><code>referral_shared</code></td>
+<td>Frontend Client</td>
+<td><span class="badge badge-high">High</span></td>
+</tr>
+<tr>
+<td><strong>Referrals</strong></td>
+<td>Friend inputs code</td>
+<td>Links referee to referrer</td>
+<td>Top-of-Funnel Referral</td>
+<td><code>referral_id</code>, <code>referrer_id</code>, <code>referee_id</code></td>
+<td><code>referral_registered</code></td>
+<td>Backend Auth</td>
+<td><span class="badge badge-critical">Critical</span></td>
+</tr>
+<tr>
+<td><strong>Referrals</strong></td>
+<td>Referee earns 1st XP</td>
+<td>Unlocks referrer bonus</td>
+<td>Qualified Acquisition</td>
+<td><code>referral_id</code>, <code>referrer_id</code>, <code>bonus_amount</code></td>
+<td><code>referral_converted</code></td>
+<td>Backend Wallet</td>
+<td><span class="badge badge-critical">Critical</span></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>5. Day 3 Core Deliverable: Top 10 Critical Analytics Gaps Identified</h2>
+<p>Cross-referencing the simulated datasets against production requirements revealed <strong>10 mission-critical gaps</strong>:</p>
+<div class="mermaid">pie title 10 Critical Analytics Gaps by Category
+    &quot;Monetary &amp; Ledger Integrity&quot; : 3
+    &quot;Growth &amp; Attribution&quot; : 2
+    &quot;Fraud &amp; Bot Security&quot; : 2
+    &quot;Identity &amp; Sessionization&quot; : 2
+    &quot;Data Quality &amp; Hygiene&quot; : 1
+</div>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Critical Analytics Gap</th>
+<th>Severity</th>
+<th>Technical Impact &amp; Vulnerability</th>
+<th>Proposed Remediation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>01</strong></td>
+<td><strong>Absence of a Double-Entry Transaction Ledger Table</strong></td>
+<td><span class="badge badge-critical">Critical</span></td>
+<td>Balances are stored as mutable scalars without debit/credit audit logs. Impossible to audit balances or detect unauthorized inflation.</td>
+<td>Build <code>fact_wallet_transactions</code> enforcing atomic running balances (<code>running_balance_after</code>).</td>
+</tr>
+<tr>
+<td><strong>02</strong></td>
+<td><strong>Absence of a Normalized Withdrawal Lifecycle Entity</strong></td>
+<td><span class="badge badge-critical">Critical</span></td>
+<td>Zero withdrawal records exist in the dataset, blinding operations to payout SLA, gateway latency, and liquidity liabilities.</td>
+<td>Build <code>fact_withdrawals</code> table tracking states: <code>Requested -&gt; Review -&gt; Processing -&gt; Completed/Rejected</code>.</td>
+</tr>
+<tr>
+<td><strong>03</strong></td>
+<td><strong>Severed Referral Attribution Linkage</strong></td>
+<td><span class="badge badge-critical">Critical</span></td>
+<td>User profiles contain a single <code>referred_by</code> foreign key with no timestamps or conversion status.</td>
+<td>Implement <code>fact_referral_conversions</code> tracking the <code>Registered -&gt; Activated -&gt; Monetized</code> lifecycle.</td>
+</tr>
+<tr>
+<td><strong>04</strong></td>
+<td><strong>Missing Task Validation &amp; Bot Telemetry</strong></td>
+<td><span class="badge badge-critical">Critical</span></td>
+<td>Tasks only record completion without system verification proof, leaving the app vulnerable to automated botnets.</td>
+<td>Emit <code>task_validation_passed</code> and <code>task_validation_failed</code> capturing risk scores and HMAC signatures.</td>
+</tr>
+<tr>
+<td><strong>05</strong></td>
+<td><strong>Lack of Client Idempotency Keys</strong></td>
+<td><span class="badge badge-high">High</span></td>
+<td>Events lack client UUIDs, making the platform vulnerable to duplicate reward minting on mobile network retries.</td>
+<td>Add UUIDv4 <code>idempotency_key</code> with a 30-minute Redis deduplication window.</td>
+</tr>
+<tr>
+<td><strong>06</strong></td>
+<td><strong>Inconsistent Feature Casing in Telemetry</strong></td>
+<td><span class="badge badge-high">High</span></td>
+<td>Raw telemetry contains mixed casing (<code>'watch ads'</code> vs <code>'Watch Ads'</code>), fragmenting SQL <code>GROUP BY</code> queries.</td>
+<td>Enforce Title Case or snake_case at API gateway input validation layer.</td>
+</tr>
+<tr>
+<td><strong>07</strong></td>
+<td><strong>Granular Onboarding Funnel Missing</strong></td>
+<td><span class="badge badge-high">High</span></td>
+<td>Onboarding is logged as a static boolean; drop-offs across initial screens are completely invisible.</td>
+<td>Instrument step-level telemetry (<code>onboarding_step_viewed</code>, <code>step_number</code>).</td>
+</tr>
+<tr>
+<td><strong>08</strong></td>
+<td><strong>Conflation of "Activity Occurred" with "Reward Credited"</strong></td>
+<td><span class="badge badge-high">High</span></td>
+<td>Task completion is erroneously assumed to equal immediate reward credit, ignoring delayed partner postbacks.</td>
+<td>Decouple client telemetry (<code>task_completed</code>) from backend accounting (<code>reward_credited</code>).</td>
+</tr>
+<tr>
+<td><strong>09</strong></td>
+<td><strong>Raw PII Storage in Analytical Layer</strong></td>
+<td><span class="badge badge-high">High</span></td>
+<td>Plaintext user emails and names in analytics models create severe GDPR and DPDP Act compliance liabilities.</td>
+<td>Implement SHA-256 pseudonymization and domain extraction in Bronze-to-Silver dbt models.</td>
+</tr>
+<tr>
+<td><strong>10</strong></td>
+<td><strong>Missing Session Heartbeat Instrumentation</strong></td>
+<td><span class="badge badge-medium">Medium</span></td>
+<td>Sessions record start and end timestamps but lack heartbeat pings, inflating active session duration.</td>
+<td>Implement 30-second client heartbeat telemetry and explicit background state events.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>6. Engineering Discovery Backlog &amp; Action Items</h2>
+<p>To resolve all items classified as <span class="badge badge-verify">To Be Verified</span> in the Source Register, the analyst structured 10 discovery questions grouped by engineering owner:
+1. <strong>Lead Backend Engineer:</strong> Confirm whether backend emits real-time events to Pub/Sub or requires database CDC, verify SQL PRIMARY KEY enforcement on user IDs, and confirm atomic ACID transactions for currency exchange.
+2. <strong>Platform &amp; Security Architect:</strong> Confirm whether ad network callbacks are verified with HMAC SHA-256 signatures, evaluate device fingerprinting capabilities to stop emulator farms, and audit CAPTCHA failure log retention.
+3. <strong>Payments &amp; Gateway Lead:</strong> Confirm payment gateway automated webhook retry policies and establish manual compliance review gates for high-value payouts.
+4. <strong>DevOps &amp; Infrastructure Lead:</strong> Confirm client IP preservation via <code>X-Forwarded-For</code> and document database retention and archival cycles.</p>
+<hr />
+<h2>7. Summary &amp; Immediate Transition to Day 4</h2>
+<h3>Milestones Completed (Days 1–3):</h3>
+<ol>
+<li><strong>Ecosystem Scoping:</strong> 15 functional modules completely audited.</li>
+<li><strong>Source Register:</strong> 26 items cataloged with strict evidence discipline (11 Confirmed, 8 Proposed, 7 To Be Verified).</li>
+<li><strong>Product Data Audit:</strong> Full mapping of user actions vs automated system outcomes.</li>
+<li><strong>Data Coverage Matrix:</strong> 15 production events detailed with required schema and priority.</li>
+<li><strong>Gap Analysis:</strong> Top 10 critical analytics gaps identified with technical remediation plans.</li>
+</ol>
+<h3>Immediate Handoff to Day 4:</h3>
+<ul>
+<li>Finalize the baseline requirements for Phase 1.</li>
+<li>Prepare the transition into <strong>Work Package B (User Identity, Lifecycle &amp; Cohort Analytics)</strong> scheduled for Days 5–6.</li>
+</ul>
+<hr />
+<p><strong>Report Compiled By:</strong> Karthik Reddy, Data Analyst Intern<br />
+<strong>Repository Working Directory:</strong> <code>C:\Users\ckart\.gemini\antigravity\scratch\veloop_analytics_task01\</code><br />
+<strong>Milestone:</strong> Days 1–3 Complete (<code>VELOOP_DAYS_1_TO_3_PROGRESS_SUBMISSION.md</code>)</p>
+  <div class="footer">
+    VELOOP Rewards Analytics Internship &bull; Task 01: Product Analytics & Data Readiness &bull; Days 1–3 Milestone Progress Submission
+  </div>
+</div>
+</body>
+</html>
