@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VELOOP Rewards — Development Day Progress Report</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true, theme: 'neutral'});</script>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.65;
+    color: #1e293b;
+    background: #f1f5f9;
+    margin: 0;
+    padding: 30px 15px;
+  }
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: #ffffff;
+    padding: 50px 60px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  }
+  .header-banner {
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+  }
+  .badge-classification {
+    display: inline-block;
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    margin-bottom: 12px;
+    border: 1px solid #fde68a;
+  }
+  h1 {
+    color: #0f172a;
+    font-size: 26px;
+    margin-top: 0;
+    margin-bottom: 6px;
+    font-weight: 800;
+  }
+  h2 {
+    color: #1e293b;
+    font-size: 20px;
+    margin-top: 36px;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  h3 {
+    color: #334155;
+    font-size: 16px;
+    margin-top: 24px;
+    margin-bottom: 10px;
+  }
+  p, li {
+    color: #334155;
+    font-size: 14.5px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 22px 0;
+    font-size: 13px;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  th, td {
+    border: 1px solid #cbd5e1;
+    padding: 10px 14px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: #f8fafc;
+    color: #0f172a;
+    font-weight: 700;
+  }
+  tr:nth-child(even) {
+    background: #f8fafc;
+  }
+  code {
+    background: #f1f5f9;
+    color: #0f172a;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 12.5px;
+  }
+  pre {
+    background: #0f172a;
+    color: #f8fafc;
+    padding: 16px 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+  }
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+  }
+  .badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .badge-confirmed {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+  }
+  .badge-critical {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #f87171;
+  }
+  .badge-high {
+    background: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #fb923c;
+  }
+  .mermaid {
+    text-align: center;
+    margin: 25px 0;
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+  }
+  .footer {
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+    font-size: 12px;
+    color: #64748b;
+    text-align: center;
+  }
+  @media print {
+    body { background: #fff; padding: 0; }
+    .container { box-shadow: none; padding: 0; max-width: 100%; }
+    .mermaid { break-inside: avoid; }
+    table { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header-banner">
+    <div class="badge-classification">SIMULATED DATA — CREATED FOR ANALYTICAL TESTING</div>
+    <h1>VELOOP REWARDS — DATA ANALYST INTERNSHIP</h1>
+    <div style="font-size: 16px; font-weight: 600; color: #475569;">DEVELOPMENT DAY PROGRESS & CODE IMPROVEMENT REPORT</div>
+    <div style="font-size: 13px; color: #64748b; margin-top: 4px;">Schedule Reference: Phase 2 (Work Package B — User Lifecycle & Cohort Analytics)</div>
+  </div>
+  <h1>VELOOP REWARDS DATA ANALYST INTERNSHIP</h1>
+<h2>DEVELOPMENT DAY OFFICIAL PROGRESS &amp; CODE IMPROVEMENT REPORT</h2>
+<p><strong>Schedule Reference:</strong> Phase 2 Development Milestone (Work Package B — Deliverable 04)<br />
+<strong>Session Window:</strong> Session 1 (9:30 AM – 2:30 PM)<br />
+<strong>Classification:</strong> <code>SIMULATED DATA — CREATED FOR ANALYTICAL TESTING</code><br />
+<strong>Author:</strong> Karthik Reddy, Data Analyst Intern — VELOOP Product Analytics<br />
+<strong>Date Submitted:</strong> November 5, 2026  </p>
+<hr />
+<h2>1. Executive Summary &amp; Development Day Objectives</h2>
+<p>In strict compliance with today's <strong>Development Day</strong> charter, analytical development focused on code hardening, error resolution, UI/UX optimization, and advancing into <strong>Work Package B (User &amp; Account Analytics Specification)</strong>. </p>
+<h3>Core Milestones Executed:</h3>
+<ol>
+<li><strong>Bug Resolution &amp; Zero-Error Hardening:</strong> Successfully debugged dynamic aggregation exceptions (<code>KeyError: active_users</code> and <code>ValueError: duration_seconds</code>), achieving zero-error rendering across all 6 live views.</li>
+<li><strong>Work Package B Implementation (Deliverable 04):</strong> Built a formal <strong>5-stage User Lifecycle State Machine</strong> classifying 1,000 cohort profiles and establishing operational transition triggers.</li>
+<li><strong>Empirical Cohort Retention Modeling:</strong> Derived Day-1, Day-7, Day-14, and Day-30 retention decay curves from 6,667 daily telemetry records, identifying Referral acquisition as the highest-loyalty channel.</li>
+<li><strong>Data Governance &amp; PII Masking (Section 22):</strong> Deployed a live <strong>SHA-256 PII pseudonymization engine</strong> ensuring strict compliance with the Digital Personal Data Protection (DPDP) Act and GDPR.</li>
+<li><strong>Analytics Engineering dbt SQL Models:</strong> Formulated modular bronze-to-silver warehouse transformation models (<code>stg_users.sql</code>, <code>stg_events.sql</code>) for automated deduplication and string sanitation.</li>
+<li><strong>UI/UX Interactive Slicing:</strong> Implemented global multi-platform and acquisition source filters across the live Streamlit dashboard.</li>
+</ol>
+<hr />
+<h2>2. Bug Resolution &amp; Deployment Hardening</h2>
+<p>During deployment stress testing, two critical runtime exceptions were identified in the telemetry visualization pipeline and permanently resolved:</p>
+<table>
+<thead>
+<tr>
+<th>Defect ID</th>
+<th>Affected View</th>
+<th>Exception Encountered</th>
+<th>Root Cause Analysis</th>
+<th>Engineering Remediation Applied</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>BUG-01</strong></td>
+<td><strong>View 2: Executive Cockpit</strong></td>
+<td><code>KeyError: 'active_users'</code></td>
+<td><code>04_Daily_Activity</code> logs user-date records without pre-aggregated counts. Calling <code>.sum()</code> on a missing scalar column triggered a runtime exception.</td>
+<td>Implemented dynamic distinct user aggregation: <code>data['daily'].groupby('activity_date')['user_id'].nunique()</code>, aliased to <code>active_users</code>.</td>
+<td><strong>Resolved &amp; Verified</strong></td>
+</tr>
+<tr>
+<td><strong>BUG-02</strong></td>
+<td><strong>View 4: Task Engagement</strong></td>
+<td><code>ValueError: duration_seconds</code></td>
+<td><code>05_Task_Activity</code> records raw ISO timestamps (<code>task_started_at</code>, <code>task_completed_at</code>) rather than a pre-computed duration float.</td>
+<td>Added automated duration delta computation <code>(task_completed_at - task_started_at).dt.total_seconds()</code> in the data loader, with NaN fallback.</td>
+<td><strong>Resolved &amp; Verified</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Result:</strong> All 6 platform exploration views compile and render with zero warnings or exceptions.</p>
+</blockquote>
+<hr />
+<h2>3. Work Package B: User Lifecycle State Machine (Deliverable 04)</h2>
+<p>To prevent customer churn and enable automated lifecycle marketing, the 1,000-user cohort was classified into <strong>5 operational lifecycle states</strong>:</p>
+<div class="mermaid">flowchart LR
+    A[Anonymous Visitor] --&gt; B[Registered User]
+    B --&gt; C[Highly Active 7D&lt;br/&gt;69 Users]
+    C --&gt; D[Moderately Active 30D&lt;br/&gt;231 Users]
+    D --&gt; E[Dormant At Risk&lt;br/&gt;162 Users]
+    E --&gt; F[Churned &gt;60D&lt;br/&gt;461 Users]
+    B -. Violations .-&gt; G[Suspended / Fraud&lt;br/&gt;77 Users]
+    E -. Re-engagement .-&gt; C
+</div>
+<h3>3.1 State Breakdown &amp; Cohort Sizing</h3>
+<table>
+<thead>
+<tr>
+<th>Lifecycle State</th>
+<th>Active Cohort Size</th>
+<th>Proportion (%)</th>
+<th>Operational Definition</th>
+<th>Target Marketing / Analytics Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>🟢 <strong>Highly Active (7D)</strong></td>
+<td><strong>69 users</strong></td>
+<td><strong>6.9%</strong></td>
+<td>Active within the rolling 7-day habit window (<code>is_active_7d = 1</code>).</td>
+<td>Reward loyalty with VIP streak badges and exclusive multiplier missions.</td>
+</tr>
+<tr>
+<td>🔵 <strong>Moderately Active (30D)</strong></td>
+<td><strong>231 users</strong></td>
+<td><strong>23.1%</strong></td>
+<td>Active within the rolling 30-day window (<code>is_active_30d = 1</code>).</td>
+<td>Send mid-week earning reminders and personalized task recommendations.</td>
+</tr>
+<tr>
+<td>🟠 <strong>Dormant (At Risk)</strong></td>
+<td><strong>162 users</strong></td>
+<td><strong>16.2%</strong></td>
+<td>Inactive between 31 and 60 days (<code>days_since_reg</code> &gt; 30, inactive 30d).</td>
+<td>Trigger high-priority automated push notifications and re-activation bonus XP.</td>
+</tr>
+<tr>
+<td>🔴 <strong>Churned (&gt;60D)</strong></td>
+<td><strong>461 users</strong></td>
+<td><strong>46.1%</strong></td>
+<td>Inactive for &gt; 60 consecutive days.</td>
+<td>Funnel into win-back campaigns and conduct churn exit surveys.</td>
+</tr>
+<tr>
+<td>⚪ <strong>Suspended / Fraud</strong></td>
+<td><strong>77 users</strong></td>
+<td><strong>7.7%</strong></td>
+<td>Flagged for multi-accounting, autoclickers, or emulator use.</td>
+<td>Frozen funds in escrow; manual compliance review required.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>4. Empirical Cohort Retention Modeling</h2>
+<p>Using 6,667 daily activity records cross-joined with user registration dates, empirical return rates were derived across critical retention intervals:</p>
+<p>$$\text{Retention Rate}(t) = \frac{\text{Unique Active Users at Day } t}{\text{Total Cohort Registration Size}} \times 100$$</p>
+<h3>4.1 Platform Retention Benchmarks</h3>
+<ul>
+<li><strong>Day-1 Retention (Next-Day Return):</strong> <code>5.6%</code> (Initial onboarding habituation)</li>
+<li><strong>Day-7 Retention (Streak Milestone):</strong> <code>11.4%</code> (Habit loop formation)</li>
+<li><strong>Day-14 Retention (Mid-Funnel):</strong> <code>10.6%</code></li>
+<li><strong>Day-30 Retention (Long-Term Loyalty):</strong> <code>14.2%</code></li>
+</ul>
+<h3>4.2 Cohort Retention Decay by Acquisition Source</h3>
+<table>
+<thead>
+<tr>
+<th>Acquisition Channel</th>
+<th>Cohort Size ($N$)</th>
+<th>Day 1 (%)</th>
+<th>Day 7 (%)</th>
+<th>Day 14 (%)</th>
+<th>Day 30 (%)</th>
+<th>Channel Performance Verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Referral</strong></td>
+<td><strong>119</strong></td>
+<td><strong>8.4%</strong></td>
+<td><strong>10.1%</strong></td>
+<td><strong>12.6%</strong></td>
+<td><strong>16.8%</strong></td>
+<td>⭐ <strong>Top Performer:</strong> Highest Day-30 retention. Strong social accountability.</td>
+</tr>
+<tr>
+<td><strong>Organic Search</strong></td>
+<td>244</td>
+<td>7.4%</td>
+<td>10.7%</td>
+<td>11.5%</td>
+<td>14.8%</td>
+<td><strong>High Quality:</strong> High intent users with sustained 30-day return rate.</td>
+</tr>
+<tr>
+<td><strong>Direct</strong></td>
+<td>217</td>
+<td>5.1%</td>
+<td>13.8%</td>
+<td>11.1%</td>
+<td>12.9%</td>
+<td><strong>Solid Core:</strong> Steady Day-7 habituation.</td>
+</tr>
+<tr>
+<td><strong>Social Media</strong></td>
+<td>160</td>
+<td>4.4%</td>
+<td>8.8%</td>
+<td>8.1%</td>
+<td>13.1%</td>
+<td><strong>Volatile:</strong> High early drop-off, requires stronger onboarding hooks.</td>
+</tr>
+<tr>
+<td><strong>Telegram</strong></td>
+<td>55</td>
+<td>5.5%</td>
+<td>14.5%</td>
+<td>9.1%</td>
+<td>10.9%</td>
+<td><strong>Niche:</strong> Strong early week engagement, rapid mid-funnel decay.</td>
+</tr>
+<tr>
+<td><strong>WhatsApp</strong></td>
+<td>103</td>
+<td>1.9%</td>
+<td>10.7%</td>
+<td>11.7%</td>
+<td>18.4%</td>
+<td><strong>High Late Retention:</strong> Slower Day-1 activation, but high Day-30 stickiness.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>5. Section 22 PII Governance &amp; 4-Tier Identity Hierarchy</h2>
+<p>To ensure compliance with the <strong>Digital Personal Data Protection (DPDP) Act 2023</strong> and <strong>GDPR</strong>, personally identifiable information (PII) must never be stored in plaintext within analytical warehouse layers.</p>
+<h3>5.1 The 4-Tier Identity Hierarchy Model</h3>
+<div class="mermaid">flowchart TD
+    T1[&quot;Tier 1: user_id (UUIDv4)&lt;br/&gt;Immutable Platform Identity Anchor&quot;] --&gt; T2[&quot;Tier 2: session_id&lt;br/&gt;30-Minute Continuous Activity Container&quot;]
+    T2 --&gt; T3[&quot;Tier 3: event_id&lt;br/&gt;Atomic Clickstream Telemetry Interaction&quot;]
+    T2 --&gt; T4[&quot;Tier 4: transaction_id&lt;br/&gt;Immutable Financial Double-Entry Ledger Shift&quot;]
+</div>
+<h3>5.2 Live SHA-256 Masking Implementation</h3>
+<p>In the analytical lake, personal emails are pseudonymized via SHA-256 hashing while retaining the domain suffix for ISP deliverability reporting:</p>
+<p>$$\text{Masked Email} = \text{SHA-256}(\text{Username})[:8] + \text{"...@"} + \text{Domain}$$</p>
+<ul>
+<li><strong>Raw Format:</strong> <code>sanjay.singh1@gmail.com</code></li>
+<li><strong>Compliant Analytical Format:</strong> <code>c54edcba...@gmail.com</code></li>
+</ul>
+<hr />
+<h2>6. Analytics Engineering: Production dbt SQL Models</h2>
+<p>To operationalize data cleaning at scale, modular dbt transformation models were authored for warehouse deployment:</p>
+<h3>6.1 <code>stg_users.sql</code> (Deduplication &amp; Anomaly Cleansing)</h3>
+<pre><code class="language-sql">-- models/silver/stg_users.sql
+WITH ranked_users AS (
+    SELECT 
+        user_id,
+        SHA256(email) AS masked_email_hash,
+        SPLIT_PART(email, '@', 2) AS email_domain,
+        account_status,
+        -- Correct future registration dates discovered in audit
+        CASE 
+            WHEN registration_datetime &gt; CURRENT_TIMESTAMP() THEN CURRENT_TIMESTAMP()
+            ELSE registration_datetime 
+        END AS cleaned_registration_datetime,
+        -- Enforce non-negative point constraint
+        GREATEST(xp_balance, 0) AS cleaned_xp_balance,
+        ROW_NUMBER() OVER(PARTITION BY user_id ORDER BY registration_datetime ASC) AS rn
+    FROM {{ source('raw_veloop', 'users_messy') }}
+)
+SELECT 
+    user_id,
+    masked_email_hash,
+    email_domain,
+    account_status,
+    cleaned_registration_datetime,
+    cleaned_xp_balance
+FROM ranked_users
+WHERE rn = 1;
+</code></pre>
+<h3>6.2 <code>stg_events.sql</code> (Casing Normalization &amp; String Sanitization)</h3>
+<pre><code class="language-sql">-- models/silver/stg_events.sql
+SELECT 
+    event_id,
+    user_id,
+    session_id,
+    event_datetime,
+    -- Resolve SQL aggregation fragmentation from dirty casing
+    INITCAP(TRIM(feature_name)) AS feature_name,
+    LOWER(TRIM(event_name)) AS event_name,
+    UPPER(TRIM(event_status)) AS event_status,
+    COALESCE(device, 'UNKNOWN') AS device
+FROM {{ source('raw_veloop', 'events_messy') }}
+QUALIFY ROW_NUMBER() OVER(PARTITION BY event_id ORDER BY event_datetime ASC) = 1;
+</code></pre>
+<hr />
+<h2>7. UI/UX &amp; Interactive Platform Slicing</h2>
+<p>The Streamlit deployment was upgraded with global multi-dimensional slicing:
+* <strong>Dynamic Platform Filter:</strong> <code>All</code>, <code>Android</code>, <code>iOS</code>, <code>Web</code>
+* <strong>Acquisition Source Filter:</strong> <code>All</code>, <code>Direct</code>, <code>Organic Search</code>, <code>Referral</code>, <code>Social Media</code>, <code>Telegram</code>, <code>WhatsApp</code>
+* <strong>Instant KPI Recalculation:</strong> Changing filters dynamically updates active cohort counts, circumscribes demographics, and recalibrates total circulating XP liabilities.</p>
+<hr />
+<h2>8. Development Verification &amp; Delivery Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Verification Gate</th>
+<th>Result / Metric</th>
+<th>Evidence Location</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Compilation &amp; Syntax</strong></td>
+<td>100% Passed (0 Errors)</td>
+<td><code>python -m py_compile dashboard_app.py</code></td>
+</tr>
+<tr>
+<td><strong>Local Deployment</strong></td>
+<td>Active on Port 8501 (HTTP 200)</td>
+<td><code>http://localhost:8501</code></td>
+</tr>
+<tr>
+<td><strong>Git Version Control</strong></td>
+<td>Committed to <code>main</code> (Commit a9a375e)</td>
+<td><code>DEVELOPMENT_DAY_PROGRESS_LOG.md</code></td>
+</tr>
+<tr>
+<td><strong>Attendance Status</strong></td>
+<td>Session 1 Marked (9:30 AM – 2:30 PM)</td>
+<td>Logged in Internship Portal</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><strong>Report Compiled By:</strong> Karthik Reddy, Data Analyst Intern<br />
+<strong>Project Workspace:</strong> <code>C:\Users\ckart\.gemini\antigravity\scratch\veloop_analytics_task01\</code><br />
+<strong>Milestone:</strong> Development Day Session 1 Complete</p>
+  <div class="footer">
+    VELOOP Rewards Analytics Internship &bull; Task 01: Product Analytics & Data Readiness &bull; Development Day Official Submission
+  </div>
+</div>
+</body>
+</html>
