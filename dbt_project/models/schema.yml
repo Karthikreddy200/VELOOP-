@@ -1,0 +1,57 @@
+version: 2
+
+models:
+  - name: stg_users
+    description: "Silver staging model for cleaned and deduplicated user profiles"
+    columns:
+      - name: user_id
+        description: "Primary key identifier for user"
+        tests:
+          - unique
+          - not_null
+      - name: masked_email_hash
+        description: "Irreversible SHA-256 salted hash of email"
+        tests:
+          - not_null
+      - name: cleaned_xp_balance
+        description: "Clamped non-negative user point balance"
+        tests:
+          - not_null
+
+  - name: stg_events
+    description: "Silver staging model for standardized telemetry clickstream events"
+    columns:
+      - name: event_id
+        description: "Primary key identifier for telemetry event"
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        description: "Foreign key referencing user entity"
+        tests:
+          - not_null
+
+  - name: dim_user_lifecycle
+    description: "Gold dimensional model classifying users into deterministic lifecycle states"
+    columns:
+      - name: user_id
+        tests:
+          - unique
+          - not_null
+      - name: lifecycle_state
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['HIGHLY_ACTIVE_7D', 'MODERATELY_ACTIVE_30D', 'DORMANT_AT_RISK', 'CHURNED', 'SUSPENDED']
+
+  - name: fact_wallet_transactions
+    description: "Gold financial fact table with double-entry ledger bookkeeping"
+    columns:
+      - name: transaction_id
+        tests:
+          - unique
+          - not_null
+      - name: reconciliation_variance
+        description: "Accounting reconciliation variance, must strictly equal 0.0000"
+        tests:
+          - not_null
