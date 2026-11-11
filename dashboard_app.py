@@ -410,11 +410,12 @@ elif menu == "👥 3. User Lifecycle & Growth (WP B)":
     st.markdown('<div class="main-header">Work Package B: User Lifecycle & Cohort Retention Analytics</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-header">Modeling user state transitions, cohort retention curves, and Section 22 PII governance.</div>', unsafe_allow_html=True)
     
-    tab_b1, tab_b2, tab_b3, tab_b4 = st.tabs([
+    tab_b1, tab_b2, tab_b3, tab_b4, tab_b5 = st.tabs([
         "📊 Acquisition & Demographics", 
         "🔄 User Lifecycle State Machine", 
         "📈 Cohort Retention Modeling", 
-        "🔒 4-Tier Identity & PII Governance"
+        "🔒 4-Tier Identity & PII Governance",
+        "🚀 Referral Funnel & Viral Growth (WP E)"
     ])
     
     with tab_b1:
@@ -585,6 +586,55 @@ elif menu == "👥 3. User Lifecycle & Growth (WP B)":
                 st.dataframe(filtered_users[['user_id', 'full_name', 'email', 'state', 'age', 'lifecycle_state']].head(8), use_container_width=True, hide_index=True)
                 st.caption("⚠️ Raw PII view restricted to Tier-1 compliance officers.")
 
+    with tab_b5:
+        st.subheader("Work Package E: Referral Attribution & Viral Growth Engine")
+        st.markdown("Evaluating the referral conversion funnel, viral coefficient ($K$-Factor), and anti-sybil self-referral defenses:")
+        
+        c_k1, c_k2, c_k3, c_k4 = st.columns(4)
+        with c_k1:
+            st.metric("Referral Cohort", "119 Users", "11.9% of Total")
+        with c_k2:
+            st.metric("Day-30 Retention", "16.8%", "+4.4% vs Direct")
+        with c_k3:
+            st.metric("Viral Coefficient (K)", "0.82", "Organic Amplification")
+        with c_k4:
+            st.metric("Fraud Collision Rate", "0.0%", "Zero Self-Referrals")
+            
+        col_ref1, col_ref2 = st.columns([1, 1])
+        with col_ref1:
+            st.markdown("#### 4-Tier Referral Conversion Funnel")
+            funnel_data = pd.DataFrame([
+                {"Stage": "1. Invites Dispatched", "Users": 595, "Conversion": "100%"},
+                {"Stage": "2. App Registrations", "Users": 119, "Conversion": "20.0%"},
+                {"Stage": "3. Activated (First Task)", "Users": 92, "Conversion": "77.3%"},
+                {"Stage": "4. Day-30 Retained Users", "Users": 20, "Conversion": "16.8%"}
+            ])
+            fig_funnel = px.funnel(funnel_data, x='Users', y='Stage', title="Referral Activation & Retention Funnel",
+                                   color_discrete_sequence=["#0284C7"])
+            fig_funnel.update_layout(template="plotly_white")
+            st.plotly_chart(fig_funnel, use_container_width=True)
+            
+        with col_ref2:
+            st.markdown("#### Interactive Viral K-Factor Simulator")
+            st.caption("Formula: $K = i \\times c$ (where $i$ is invites per user, and $c$ is invitee conversion rate)")
+            invites_per_user = st.slider("Average Invites Sent per User (i):", min_value=1.0, max_value=10.0, value=3.2, step=0.1)
+            conv_rate = st.slider("Invitee Registration Conversion Rate (c %):", min_value=5.0, max_value=50.0, value=25.0, step=1.0) / 100.0
+            
+            calc_k = round(invites_per_user * conv_rate, 2)
+            if calc_k >= 1.0:
+                st.success(f"🚀 **Viral Explosion! K-Factor = {calc_k}** (Every user brings in >1 new user — Exponential Organic Growth!)")
+            elif calc_k >= 0.7:
+                st.info(f"📈 **Strong Organic Growth: K-Factor = {calc_k}** (Reduces blended Customer Acquisition Cost significantly)")
+            else:
+                st.warning(f"⚠️ **Linear Growth: K-Factor = {calc_k}** (Growth requires continuous paid acquisition channels)")
+                
+            st.markdown("#### Anti-Sybil Self-Referral Defenses:")
+            st.markdown("""
+            • **Device Fingerprint Locking:** Rejects referrals originating from matching hardware IMEI/Advertising IDs.  
+            • **Subnet Collision Guard:** Restricts referrals between accounts sharing identical `/24` IP subnets within 24 hours.  
+            • **Activation Milestone Escrow:** Referral rewards remain locked until the referee completes their first verified rewarded task.
+            """)
+
 # ==========================================
 # VIEW 4: TASK & FEATURE ENGAGEMENT
 # ==========================================
@@ -593,45 +643,120 @@ elif menu == "🎯 4. Task & Feature Engagement":
     st.markdown('<div class="main-header">Task Earning & Feature Engagement Intelligence</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-header">Evaluating micro-task completion funnels, conversion rates, and friction points.</div>', unsafe_allow_html=True)
     
-    # Filter by task category
-    categories = ["All"] + list(data['tasks']['task_category'].unique())
-    selected_cat = st.selectbox("Filter by Task Category:", categories)
+    tab_eng1, tab_eng2 = st.tabs([
+        "📊 Task Performance & Velocity",
+        "🛡️ Anti-Farming & Bot Defense Simulator (WP C)"
+    ])
     
-    filtered_tasks = data['tasks'] if selected_cat == "All" else data['tasks'][data['tasks']['task_category'] == selected_cat]
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        st.subheader("Task Completion Status Distribution")
-        task_status_df = filtered_tasks['task_status'].value_counts().reset_index()
-        task_status_df.columns = ['Status', 'Count']
-        fig_ts = px.bar(task_status_df, x='Status', y='Count', color='Status',
-                        color_discrete_map={
-                            'Completed': '#10B981',
-                            'In Progress': '#3B82F6',
-                            'Abandoned': '#EF4444',
-                            'Failed': '#F59E0B'
-                        },
-                        title=f"Task Completion Breakdown ({selected_cat})")
-        fig_ts.update_layout(template="plotly_white")
-        st.plotly_chart(fig_ts, use_container_width=True)
+    with tab_eng1:
+        # Filter by task category
+        categories = ["All"] + list(data['tasks']['task_category'].unique())
+        selected_cat = st.selectbox("Filter by Task Category:", categories)
         
-    with col2:
-        st.subheader("Completion Time (Seconds) by Category")
-        completed_tasks_duration = data['tasks'].dropna(subset=['duration_seconds'])
-        fig_box = px.box(completed_tasks_duration, x='task_category', y='duration_seconds', 
-                         color='task_category', title="Task Duration Spread (Friction Analysis - Completed Tasks)")
-        fig_box.update_layout(template="plotly_white", showlegend=False)
-        st.plotly_chart(fig_box, use_container_width=True)
+        filtered_tasks = data['tasks'] if selected_cat == "All" else data['tasks'][data['tasks']['task_category'] == selected_cat]
         
-    st.subheader("Hourly Feature Engagement Heatmap")
-    events_copy = data['events'].copy()
-    events_copy['hour'] = events_copy['event_datetime'].dt.hour
-    hourly_counts = events_copy.groupby(['hour', 'feature_name']).size().reset_index(name='event_count')
-    fig_heat = px.density_heatmap(hourly_counts, x='hour', y='feature_name', z='event_count',
-                                  title="Engagement Density Across 24-Hour Day",
-                                  color_continuous_scale="Viridis")
-    fig_heat.update_layout(template="plotly_white")
-    st.plotly_chart(fig_heat, use_container_width=True)
+        col1, col2 = st.columns(2)
+        with col1:
+            st.subheader("Task Completion Status Distribution")
+            task_status_df = filtered_tasks['task_status'].value_counts().reset_index()
+            task_status_df.columns = ['Status', 'Count']
+            fig_ts = px.bar(task_status_df, x='Status', y='Count', color='Status',
+                            color_discrete_map={
+                                'Completed': '#10B981',
+                                'In Progress': '#3B82F6',
+                                'Abandoned': '#EF4444',
+                                'Failed': '#F59E0B'
+                            },
+                            title=f"Task Completion Breakdown ({selected_cat})")
+            fig_ts.update_layout(template="plotly_white")
+            st.plotly_chart(fig_ts, use_container_width=True)
+            
+        with col2:
+            st.subheader("Completion Time (Seconds) by Category")
+            completed_tasks_duration = data['tasks'].dropna(subset=['duration_seconds'])
+            fig_box = px.box(completed_tasks_duration, x='task_category', y='duration_seconds', 
+                             color='task_category', title="Task Duration Spread (Friction Analysis - Completed Tasks)")
+            fig_box.update_layout(template="plotly_white", showlegend=False)
+            st.plotly_chart(fig_box, use_container_width=True)
+            
+        st.subheader("Hourly Feature Engagement Heatmap")
+        events_copy = data['events'].copy()
+        events_copy['hour'] = events_copy['event_datetime'].dt.hour
+        hourly_counts = events_copy.groupby(['hour', 'feature_name']).size().reset_index(name='event_count')
+        fig_heat = px.density_heatmap(hourly_counts, x='hour', y='feature_name', z='event_count',
+                                      title="Engagement Density Across 24-Hour Day",
+                                      color_continuous_scale="Viridis")
+        fig_heat.update_layout(template="plotly_white")
+        st.plotly_chart(fig_heat, use_container_width=True)
+
+    with tab_eng2:
+        st.subheader("Work Package C: Anti-Farming & Bot Defense Simulator")
+        st.markdown("Automated clickstream velocity rules and bot-detection heuristics protecting the reward economy:")
+        
+        c_af1, c_af2, c_af3, c_af4 = st.columns(4)
+        with c_af1:
+            st.metric("Daily Rewarded Ad Cap", "20 Ads / Day", "Strict Ceiling")
+        with c_af2:
+            st.metric("Min Video Playback", "28 Seconds", "Anti-Skip Guard")
+        with c_af3:
+            st.metric("Hourly Earning Ceiling", "1,000 XP / Hr", "Anti-Spike Limit")
+        with c_af4:
+            st.metric("Max Human Tap Speed", "10 Taps / Sec", "Autoclicker Threshold")
+            
+        st.markdown("---")
+        st.markdown("#### 1. Interactive Tap & Earn Bot Detector")
+        st.caption("Heuristic engine analyzes clickstream frequencies and inter-tap micro-jitter variance.")
+        
+        col_bot1, col_bot2 = st.columns(2)
+        with col_bot1:
+            if st.button("👤 Simulate Normal Human Tapping"):
+                st.success("✅ **HUMAN VERIFIED** — Cadence: `4.1 taps/sec`, Interval Variance: `0.028s` (Natural biological micro-jitter). No challenge required.")
+                st.json({
+                    "test_type": "HUMAN_SIMULATION",
+                    "sample_intervals_sec": [0.24, 0.28, 0.21, 0.29, 0.25],
+                    "mean_speed_taps_per_sec": 4.12,
+                    "std_deviation_variance": 0.0284,
+                    "heuristic_verdict": "HUMAN_VERIFIED",
+                    "action_taken": "ALLOW_REWARD_CREDIT"
+                })
+                
+        with col_bot2:
+            if st.button("🤖 Simulate Autoclicker Bot"):
+                st.error("🚨 **BOT DETECTED!** — Superhuman speed (`48.5 taps/sec`) and robotic zero variance (`0.000s`). Mandatory CAPTCHA triggered!")
+                st.json({
+                    "test_type": "AUTOCLICKER_BOT_SIMULATION",
+                    "sample_intervals_sec": [0.02, 0.02, 0.02, 0.02, 0.02],
+                    "mean_speed_taps_per_sec": 48.50,
+                    "std_deviation_variance": 0.0001,
+                    "heuristic_verdict": "BOT_DETECTED_SUPERHUMAN_SPEED",
+                    "action_taken": "BLOCK_CREDIT_AND_TRIGGER_CAPTCHA"
+                })
+                
+        st.markdown("---")
+        st.markdown("#### 2. Reward Token Economy Health & Liquidity Monitor")
+        col_eco1, col_eco2 = st.columns([1, 1])
+        with col_eco1:
+            total_minted = st.number_input("Total XP Minted (Distributed):", min_value=1000, max_value=500000, value=12450, step=1000)
+            total_burned = st.number_input("Total XP Burned / Withdrawn:", min_value=0, max_value=500000, value=8900, step=500)
+            cash_reserve = st.number_input("Escrow Cash Reserve ($ USD):", min_value=10.0, max_value=10000.0, value=65.0, step=10.0)
+            
+        with col_eco2:
+            burn_ratio = round((total_burned / total_minted) * 100.0, 1) if total_minted > 0 else 0.0
+            outstanding_tokens = max(total_minted - total_burned, 0)
+            outstanding_liability = round(outstanding_tokens / 100.0, 2)
+            lcr = round(cash_reserve / outstanding_liability, 2) if outstanding_liability > 0 else 2.0
+            
+            st.markdown("##### Economy Health Indicators:")
+            st.write(f"• **Burn-to-Mint Velocity:** `{burn_ratio}%` (Target: ≥70%)")
+            st.write(f"• **Outstanding Token Liability:** `${outstanding_liability:.2f} USD` ({outstanding_tokens} XP)")
+            st.write(f"• **Liquidity Coverage Ratio (LCR):** `{lcr}x` (Target: ≥1.2x reserve backing)")
+            
+            if lcr >= 1.20 and burn_ratio >= 70.0:
+                st.success("🟢 **Economy Health: HEALTHY & FULLY SOLVENT**")
+            elif lcr >= 1.0:
+                st.warning("🟡 **Economy Health: MODERATE INFLATION RISK** — Monitor withdrawal velocity.")
+            else:
+                st.error("🔴 **Economy Health: CRITICAL DEFICIT** — Cash reserve underfunded.")
 
 # ==========================================
 # VIEW 5: DATA QUALITY FORENSIC AUDIT

@@ -13,6 +13,11 @@ from src.analytics.reward_economy_engine import (
     validate_earning_velocity,
     calculate_token_economy_health
 )
+from src.analytics.referral_attribution import (
+    calculate_k_factor,
+    compute_referral_conversion_funnel,
+    detect_referral_sybil_fraud
+)
 from src.governance.pii_masking import (
     hash_identifier,
     mask_email_format_preserving,
@@ -173,6 +178,45 @@ class TestVELOOPAnalyticsEngine(unittest.TestCase):
         self.assertEqual(health['liquidity_coverage_ratio'], 2.0)
         self.assertTrue(health['is_reserve_adequate'])
         self.assertEqual(health['economy_status'], "HEALTHY_CIRCULATION")
+
+    # ==========================================
+    # WORK PACKAGE E: REFERRAL & VIRAL GROWTH TESTS
+    # ==========================================
+    def test_referral_k_factor_calculation(self):
+        # 100 users, 250 invites sent, 80 converted -> i = 2.5, c = 0.32 -> K = 0.8
+        res = calculate_k_factor(total_active_users=100, total_invites_sent=250, converted_referees=80)
+        self.assertEqual(res['invites_per_user'], 2.5)
+        self.assertEqual(res['conversion_rate_pct'], 32.0)
+        self.assertEqual(res['k_factor'], 0.8)
+        self.assertEqual(res['viral_status'], "HEALTHY_ORGANIC_AMPLIFICATION")
+
+    def test_referral_funnel_stages(self):
+        funnel = compute_referral_conversion_funnel(cohort_size=119)
+        self.assertEqual(len(funnel), 4)
+        self.assertEqual(funnel[0]['stage'], "1. Invites Sent")
+        self.assertEqual(funnel[1]['count'], 119)
+        self.assertEqual(funnel[3]['conversion_pct'], 16.8)
+
+    def test_referral_sybil_fraud_detection(self):
+        # 1. Device collision
+        is_fraud, msg = detect_referral_sybil_fraud(
+            referrer_device_id="DEV_IMEI_12345",
+            referee_device_id="DEV_IMEI_12345",
+            referrer_ip="103.21.4.10",
+            referee_ip="103.21.4.15"
+        )
+        self.assertTrue(is_fraud)
+        self.assertTrue("FRAUD_HARDWARE_COLLISION" in msg)
+
+        # 2. Clean referral
+        is_fraud, msg = detect_referral_sybil_fraud(
+            referrer_device_id="DEV_IMEI_11111",
+            referee_device_id="DEV_IMEI_22222",
+            referrer_ip="103.21.4.10",
+            referee_ip="49.36.12.50"
+        )
+        self.assertFalse(is_fraud)
+        self.assertEqual(msg, "CLEAN_REFERRAL_VERIFIED")
 
     # ==========================================
     # DATA LAKE IMMUTABILITY TEST
