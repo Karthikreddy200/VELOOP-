@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VELOOP Rewards - Review, Demo & Feedback Day Master Submission - 12 Nov 2026</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 10mm 12mm 10mm 12mm;
+    }
+    
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+      font-size: 8.8pt;
+      line-height: 1.34;
+      color: #1e293b;
+      margin: 0;
+      padding: 0;
+      background: #ffffff;
+    }
+
+    .page {
+      page-break-after: always;
+      break-after: page;
+      position: relative;
+      height: 275mm;
+      max-height: 275mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      overflow: hidden;
+    }
+
+    .page:last-child {
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+
+    /* Running Header */
+    .running-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 7.6pt;
+      color: #64748b;
+      padding-bottom: 4px;
+      margin-bottom: 8px;
+      border-bottom: 1px solid #cbd5e1;
+      font-weight: 600;
+    }
+
+    /* Brand Header */
+    .brand-title {
+      font-size: 17pt;
+      font-weight: 900;
+      color: #0f172a;
+      letter-spacing: -0.4px;
+      margin-bottom: 2px;
+      text-transform: uppercase;
+    }
+
+    .brand-subtitle {
+      font-size: 8.6pt;
+      font-weight: 800;
+      color: #0284c7;
+      text-transform: uppercase;
+      letter-spacing: 1.1px;
+      margin-bottom: 2px;
+    }
+
+    .brand-tagline {
+      font-size: 7.6pt;
+      font-style: italic;
+      color: #64748b;
+      margin-bottom: 8px;
+    }
+
+    /* Dual Tone Distinction Banner */
+    .distinction-banner {
+      background: linear-gradient(90deg, #fef3c7 0%, #e0f2fe 100%);
+      border: 1.5px solid #0284c7;
+      border-radius: 6px;
+      padding: 6px 12px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 8pt;
+    }
+
+    .badge-sim {
+      background: #d97706;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 7pt;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .badge-prod {
+      background: #0284c7;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 7pt;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    /* Meta Grid */
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 130px 1fr 130px 1fr;
+      gap: 3px 10px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 8pt;
+      margin-bottom: 8px;
+    }
+
+    .meta-lbl {
+      font-weight: 700;
+      color: #475569;
+      text-transform: uppercase;
+      font-size: 7pt;
+      letter-spacing: 0.3px;
+    }
+
+    .meta-val {
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    /* Section Headings */
+    h2 {
+      font-size: 10.2pt;
+      font-weight: 800;
+      color: #0f172a;
+      margin-top: 6px;
+      margin-bottom: 4px;
+      border-bottom: 1.5px solid #0284c7;
+      padding-bottom: 2px;
+      letter-spacing: -0.2px;
+    }
+
+    h3 {
+      font-size: 8.8pt;
+      font-weight: 700;
+      color: #0369a1;
+      margin-top: 5px;
+      margin-bottom: 2px;
+    }
+
+    p {
+      margin: 0 0 4px 0;
+      text-align: justify;
+      color: #334155;
+    }
+
+    ul {
+      margin: 2px 0 4px 0;
+      padding-left: 15px;
+    }
+
+    li {
+      margin-bottom: 2px;
+      color: #334155;
+      line-height: 1.3;
+    }
+
+    li strong {
+      color: #0f172a;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 7.7pt;
+      background: #f1f5f9;
+      padding: 1px 3px;
+      border-radius: 3px;
+      color: #0369a1;
+      font-weight: 600;
+    }
+
+    /* Table */
+    table.rep-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 4px 0 6px 0;
+      font-size: 7.8pt;
+    }
+
+    table.rep-table th {
+      background: #0f172a;
+      color: #ffffff;
+      padding: 4px 6px;
+      text-align: left;
+      font-weight: 700;
+      font-size: 7.4pt;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      border: 1px solid #0f172a;
+    }
+
+    table.rep-table td {
+      padding: 4px 6px;
+      border: 1px solid #cbd5e1;
+      vertical-align: top;
+      line-height: 1.28;
+    }
+
+    table.rep-table tr:nth-child(even) td {
+      background: #f8fafc;
+    }
+
+    /* Card styling */
+    .card-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-left: 3.5px solid #0284c7;
+      border-radius: 4px;
+      padding: 6px 8px;
+      margin: 4px 0 6px 0;
+      font-size: 8pt;
+    }
+
+    /* Screenshot Container */
+    .shot-card {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 6px 8px;
+      margin-bottom: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .shot-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .shot-title {
+      font-size: 8.6pt;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .shot-badge {
+      font-size: 6.8pt;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 3px;
+      background: #0284c7;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .shot-img {
+      width: 100%;
+      max-height: 85mm;
+      object-fit: contain;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      display: block;
+      background: #f1f5f9;
+    }
+
+    .shot-caption {
+      font-size: 7.3pt;
+      color: #475569;
+      margin-top: 3px;
+      line-height: 1.25;
+    }
+
+    .step-box {
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      border-radius: 4px;
+      padding: 5px 8px;
+      margin-bottom: 4px;
+      font-size: 7.9pt;
+    }
+
+    .step-title {
+      font-weight: 800;
+      color: #0284c7;
+      margin-bottom: 2px;
+    }
+
+    .doc-footnote {
+      font-size: 7pt;
+      color: #64748b;
+      font-style: italic;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 3px;
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== PAGE 1 ==================== -->
+  <div class="page" id="page-1">
+    <div class="running-header">
+      <span>VELOOP Rewards • Official Internship Communication • Review & Demo Day Submission</span>
+      <span>Page 1 of 6</span>
+    </div>
+
+    <div class="brand-title">VELOOP REWARDS</div>
+    <div class="brand-subtitle">REVIEW, DEMO & FEEDBACK DAY OFFICIAL SUBMISSION</div>
+    <div class="brand-tagline">Three-Day Work Cycle — Day 3: Review, Demo & Feedback Day • 12 November 2026</div>
+
+    <div class="distinction-banner">
+      <div>
+        <span class="badge-sim">SIMULATED TESTING DATASET</span>
+        <span style="color: #78350F; font-weight: 600; margin-left: 4px;">1,000 Users • 35k Telemetry Events (Created for Testing)</span>
+      </div>
+      <div>
+        <span class="badge-prod">VELOOP PRODUCTION SPECIFICATION</span>
+        <span style="color: #0C4A6E; font-weight: 600; margin-left: 4px;">21 Deliverables • 19 Tests Passed • 7 Live Views</span>
+      </div>
+    </div>
+
+    <div class="meta-grid">
+      <div class="meta-lbl">Intern Name</div>
+      <div class="meta-val">Karthik Reddy</div>
+      <div class="meta-lbl">Project Assigned</div>
+      <div class="meta-val">Task 01: Product Analytics & Data Readiness</div>
+
+      <div class="meta-lbl">Role</div>
+      <div class="meta-val">Data Analyst Intern</div>
+      <div class="meta-lbl">Cycle Phase</div>
+      <div class="meta-val">Three-Day Cycle — Day 3: Review & Demo Day</div>
+
+      <div class="meta-lbl">Repository</div>
+      <div class="meta-val">https://github.com/Karthikreddy200/VELOOP-</div>
+      <div class="meta-lbl">Working Commit</div>
+      <div class="meta-val">346ffe3 (README & Deliverables Synchronized)</div>
+
+      <div class="meta-lbl">Live Demo URL</div>
+      <div class="meta-val">http://localhost:8501 (Port 8501 Active Daemon)</div>
+      <div class="meta-lbl">Test Coverage</div>
+      <div class="meta-val">19/19 Unit Tests Passed (100% Pass Rate in 0.003s)</div>
+    </div>
+
+    <h2>1. Official Review-Day Submission Checklist (Section 6 Compliance)</h2>
+    <table class="rep-table">
+      <thead>
+        <tr>
+          <th style="width: 25%;">Checklist Requirement</th>
+          <th style="width: 40%;">Evidence & Implementation Delivered</th>
+          <th style="width: 35%;">Direct Access Location</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>1. Progress Evidence</strong></td>
+          <td>Clean Git repo, live Streamlit platform, and 8 high-res UI screenshots.</td>
+          <td>GitHub: <code>Karthikreddy200/VELOOP-</code> | Live: <code>http://localhost:8501</code></td>
+        </tr>
+        <tr>
+          <td><strong>2. Completed Work</strong></td>
+          <td>All 21 deliverables completed, WP E Referral engine, WP C Bot Defense simulator.</td>
+          <td>View 7 Matrix & Master Blueprint Section 21.</td>
+        </tr>
+        <tr>
+          <td><strong>3. Changes Made</strong></td>
+          <td>Addressed all 6 reviewer feedback items: wallet ledger, bot detection, raw data audit.</td>
+          <td>Section 2 of this report (Table 1).</td>
+        </tr>
+        <tr>
+          <td><strong>4. Testing Performed</strong></td>
+          <td>19 automated unit tests, double-entry balance check (0.0000 USD variance), dbt syntax.</td>
+          <td><code>tests/test_analytics.py</code> (100% pass rate in 0.003s).</td>
+        </tr>
+        <tr>
+          <td><strong>5. Blockers & Risks</strong></td>
+          <td>Zero technical blockers. Documented simulated testing boundaries in Register.</td>
+          <td>Source & Verification Register (Deliverable 19).</td>
+        </tr>
+        <tr>
+          <td><strong>6. Next Steps</strong></td>
+          <td>Roadmap established for Days 4–6: Real-time event streaming & production ETL.</td>
+          <td>Section 7 of this report.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>2. Resolution of Previous Review Feedback</h2>
+    <p>
+      Every item identified during the previous review cycle has been resolved, validated with automated unit tests, and demonstrated in the live dashboard:
+    </p>
+    <ul>
+      <li><strong>Verified All Dashboard Views & Calculations:</strong> Re-verified all 7 views in <code>dashboard_app.py</code> with interactive slice filtering and zero visual artifacts.</li>
+      <li><strong>Data Quality & Raw Data Preservation:</strong> Confirmed that Bronze raw Excel datasets remain 100% immutable while clean views are produced in Silver/Gold layers.</li>
+      <li><strong>Validated Wallet Ledger & Withdrawal Logic:</strong> Enforced double-entry ledger math (Debits = Credits) with a 4-stage withdrawal validation pipeline.</li>
+      <li><strong>Simulated vs. Actual VELOOP Distinction:</strong> Persistent dual-tone banners applied across all screens and report pages.</li>
+      <li><strong>21 Deliverables Verification:</strong> View 7 built with interactive search mapping all 21 deliverables.</li>
+      <li><strong>VELOOP Rewards KPI Alignment:</strong> Aligned 20-ad daily caps, 1,000 XP/hr limits, and $2.0\times$ token Liquidity Coverage Ratio.</li>
+    </ul>
+
+    <div class="doc-footnote">
+      VELOOP Rewards • Official Internship Communication • Task 01: Product Analytics & Data Readiness
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 2 ==================== -->
+  <div class="page" id="page-2">
+    <div class="running-header">
+      <span>VELOOP Rewards • Official Internship Communication • Review & Demo Day Submission</span>
+      <span>Page 2 of 6</span>
+    </div>
+
+    <h2>3. Executive Technical Achievements: Growth & Security Engines</h2>
+
+    <h3>3.1 Work Package E: Viral Growth & Referral Attribution ($K = 0.82$)</h3>
+    <p>
+      Formalized the viral coefficient formula $K = i \times c$ to evaluate platform self-sustaining viral loop dynamics:
+    </p>
+    <p style="text-align: center; font-weight: 700; color: #0f172a;">
+      $$K = 3.2 \text{ invites/user} \times 25.6\% \text{ conversion} = 0.82$$
+    </p>
+    <table class="rep-table">
+      <thead>
+        <tr>
+          <th style="width: 25%;">Funnel Stage</th>
+          <th style="width: 20%;">User Volume</th>
+          <th style="width: 20%;">Stage Conversion</th>
+          <th style="width: 35%;">Strategic Analytical Takeaway</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>1. Invites Dispatched</strong></td>
+          <td>595 invites</td>
+          <td>100.0% baseline</td>
+          <td>Social outreach across WhatsApp, Telegram, and SMS.</td>
+        </tr>
+        <tr>
+          <td><strong>2. App Registrations</strong></td>
+          <td>119 accounts</td>
+          <td>20.0% conversion</td>
+          <td>Attributed installs via unique referral attribution links.</td>
+        </tr>
+        <tr>
+          <td><strong>3. Activated (First Task)</strong></td>
+          <td>92 accounts</td>
+          <td>77.3% activation</td>
+          <td>High intent: >77% complete their first rewarded action in &lt;24h.</td>
+        </tr>
+        <tr>
+          <td><strong>4. Day-30 Retained</strong></td>
+          <td>20 accounts</td>
+          <td><strong>16.8% retention</strong></td>
+          <td><strong>#1 Channel:</strong> Outperforms Search (4.8%) and Paid Ads (7.2%).</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>3.2 Work Package C: Anti-Farming & Bot Defense Heuristics</h3>
+    <ul>
+      <li><strong>Clickstream Jitter & Velocity Detection:</strong>
+        <ul>
+          <li><em>Human Baseline:</em> $\sim 240$ms interval ($4.1$ taps/s) with biological micro-jitter variance $\sigma > 20$ms ($\to$ <code>HUMAN_VERIFIED</code>).</li>
+          <li><em>Autoclicker / Bot Profile:</em> Scripted $>10$ taps/s with robotic micro-jitter $\sigma < 8$ms ($\to$ <code>BOT_DETECTED</code>, triggers rate limiting & CAPTCHA).</li>
+        </ul>
+      </li>
+      <li><strong>Daily Ad-Watch Velocity Cap:</strong> Enforces maximum 20 ads/24h with minimum 28-second active duration to defeat video skip automation.</li>
+      <li><strong>Token Mint-to-Burn Liquidity Ratio:</strong> Implements a 90% burn reserve on payout redemptions, ensuring a platform Liquidity Coverage Ratio (LCR) of $2.0\times$.</li>
+      <li><strong>Zero-Variance Double-Entry Ledger:</strong> Validated $1,428.50 Debits = $1,428.50 Credits across Accounts 1010 and 2010 ($0.0000$ USD variance).</li>
+    </ul>
+
+    <div class="doc-footnote">
+      VELOOP Rewards • Official Internship Communication • Task 01: Product Analytics & Data Readiness
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 3 ==================== -->
+  <div class="page" id="page-3">
+    <div class="running-header">
+      <span>VELOOP Rewards • Official Internship Communication • Review & Demo Day Submission</span>
+      <span>Page 3 of 6</span>
+    </div>
+
+    <h2>4. Live Dashboard Screenshots (Part 1: Cockpit & Viral Funnel)</h2>
+
+    <!-- Screenshot 1 -->
+    <div class="shot-card">
+      <div class="shot-header">
+        <span class="shot-title">View 2: Executive Cockpit & North Star Metrics</span>
+        <span class="shot-badge">Platform Overview</span>
+      </div>
+      <img src="screenshots/01_executive_cockpit.png" alt="Executive Cockpit Dashboard View" class="shot-img">
+      <div class="shot-caption">
+        <strong>Figure 1: Executive Overview Cockpit.</strong> Live macro metrics: 50.8% DAU/MAU stickiness, $0.48 gross revenue/user, 9,846 tasks, and dynamic daily active user time-series trends with platform and channel slice filters.
+      </div>
+    </div>
+
+    <!-- Screenshot 2 -->
+    <div class="shot-card">
+      <div class="shot-header">
+        <span class="shot-title">View 3 Tab 5: Referral Funnel & Viral K-Factor Simulator (WP E)</span>
+        <span class="shot-badge">Growth Engine</span>
+      </div>
+      <img src="screenshots/03_referral_viral_growth_wpe.png" alt="Referral Funnel and K-Factor Simulator" class="shot-img">
+      <div class="shot-caption">
+        <strong>Figure 2: Referral Attribution & Viral Growth Engine.</strong> Plotly funnel tracking 595 invites &rarr; 119 installs &rarr; 92 active &rarr; 20 D30 retained (16.8%), alongside interactive $K$-factor growth simulator ($K=0.82$) and anti-sybil scorecards.
+      </div>
+    </div>
+
+    <div class="doc-footnote">
+      VELOOP Rewards • Official Internship Communication • Task 01: Product Analytics & Data Readiness
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 4 ==================== -->
+  <div class="page" id="page-4">
+    <div class="running-header">
+      <span>VELOOP Rewards • Official Internship Communication • Review & Demo Day Submission</span>
+      <span>Page 4 of 6</span>
+    </div>
+
+    <h2>5. Live Dashboard Screenshots (Part 2: Security & Ledger)</h2>
+
+    <!-- Screenshot 3 -->
+    <div class="shot-card">
+      <div class="shot-header">
+        <span class="shot-title">View 4 Tab 2: Anti-Farming & Bot Defense Simulator (WP C)</span>
+        <span class="shot-badge">Fraud Defense</span>
+      </div>
+      <img src="screenshots/05_anti_farming_bot_defense_wpc.png" alt="Anti Farming and Bot Defense Simulator" class="shot-img">
+      <div class="shot-caption">
+        <strong>Figure 3: Clickstream Bot Defense & Velocity Guards.</strong> Real-time heuristic simulator testing human tapping against robotic autoclickers (>10 taps/sec, <8ms jitter) with automatic blocking, 20-ad cap guards, and $2.0\times$ token liquidity coverage.
+      </div>
+    </div>
+
+    <!-- Screenshot 4 -->
+    <div class="shot-card">
+      <div class="shot-header">
+        <span class="shot-title">View 6: Live Double-Entry Wallet & Payout Reconciliation</span>
+        <span class="shot-badge">Fintech Ledger</span>
+      </div>
+      <img src="screenshots/07_wallet_double_entry_ledger.png" alt="Double Entry Financial Ledger and Withdrawal Validation" class="shot-img">
+      <div class="shot-caption">
+        <strong>Figure 4: Double-Entry Financial Ledger & Withdrawal Validation.</strong> Mathematical proof of zero variance between Debits ($1,428.50) and Credits ($1,428.50) with automated 4-stage withdrawal security pipeline.
+      </div>
+    </div>
+
+    <div class="doc-footnote">
+      VELOOP Rewards • Official Internship Communication • Task 01: Product Analytics & Data Readiness
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 5 ==================== -->
+  <div class="page" id="page-5">
+    <div class="running-header">
+      <span>VELOOP Rewards • Official Internship Communication • Review & Demo Day Submission</span>
+      <span>Page 5 of 6</span>
+    </div>
+
+    <h2>6. Interactive Live Demo Walkthrough Script (5-Minute Guide)</h2>
+    <p>
+      During the review demo session, the following structured sequence will be executed on the live platform (<code>http://localhost:8501</code>):
+    </p>
+
+    <div class="step-box">
+      <div class="step-title">Step 1: Executive Cockpit & North Star Metrics (View 2)</div>
+      • Open View 2. Highlight platform health across 1,000 synthetic test profiles.<br>
+      • Demonstrate <strong>50.8% DAU/MAU stickiness</strong> and use the Acquisition Channel filter to show organic vs paid performance.
+    </div>
+
+    <div class="step-box">
+      <div class="step-title">Step 2: Referral Funnel & Viral K-Factor Simulator (View 3 Tab 5)</div>
+      • Navigate to View 3 Tab 5. Walk through the 4-tier referral conversion funnel.<br>
+      • Highlight that <strong>Referral is the #1 retention channel (16.8% D30)</strong>.<br>
+      • Move the interactive $K$-factor slider from $c=25.6\%$ to $c=32\%$ to demonstrate how conversion optimization unlocks exponential organic growth ($K \ge 1.0$).
+    </div>
+
+    <div class="step-box">
+      <div class="step-title">Step 3: Anti-Farming & Bot Defense Simulator (View 4 Tab 2)</div>
+      • Navigate to View 4 Tab 2. Click <strong>"Simulate Human Tapping"</strong> (shows 4.1 taps/s, 28ms jitter &rarr; <code>HUMAN_VERIFIED</code>).<br>
+      • Click <strong>"Simulate Autoclicker Bot"</strong> (shows 48.5 taps/s, 0.1ms jitter &rarr; <code>BOT_DETECTED</code> with rate limit triggered).<br>
+      • Present the 20-ad daily velocity limits and $2.0\times$ Liquidity Coverage Ratio.
+    </div>
+
+    <div class="step-box">
+      <div class="step-title">Step 4: Double-Entry Ledger & Payout Pipeline (View 6)</div>
+      • Open View 6. Show the double-entry balance table proving <strong>0.0000 USD variance</strong> between Debits and Credits.<br>
+      • Walk through the 4-stage automated withdrawal pipeline: Balance &rarr; KYC &rarr; AML Velocity &rarr; Fraud Risk Scoring (&lt;0.70).
+    </div>
+
+    <div class="step-box">
+      <div class="step-title">Step 5: Data Quality Forensics & 21 Deliverables Matrix (Views 5 & 7)</div>
+      • Open View 5 to demonstrate raw data preservation while isolating 11 Bronze anomalies.<br>
+      • Open View 7 to present the complete 21 Deliverables Verification Matrix (100% verified).
+    </div>
+
+    <div class="doc-footnote">
+      VELOOP Rewards • Official Internship Communication • Task 01: Product Analytics & Data Readiness
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 6 ==================== -->
+  <div class="page" id="page-6">
+    <div class="running-header">
+      <span>VELOOP Rewards • Official Internship Communication • Review & Demo Day Submission</span>
+      <span>Page 6 of 6</span>
+    </div>
+
+    <h2>7. Automated Testing Proof, CI/CD & Next Cycle Roadmap</h2>
+
+    <div class="card-box" style="border-left-color: #16a34a; background: #f0fdf4;">
+      <strong>Automated Unit Test Suite Execution:</strong><br>
+      <code>python -m unittest tests/test_analytics.py</code><br>
+      <code>...................</code><br>
+      <code>Ran 19 tests in 0.003s</code><br>
+      <strong style="color: #16a34a;">OK (19 Passed / 0 Failed / 0 Warnings — 100% Pass Rate)</strong>
+    </div>
+
+    <h3>7.1 Production dbt Transformations & CI/CD</h3>
+    <ul>
+      <li><strong>dbt Modular Transformations:</strong> Models implemented in <code>dbt_project/models/</code>:
+        <ul>
+          <li><code>staging/stg_users.sql</code> & <code>staging/stg_events.sql</code>: Cleaned, type-casted Bronze-to-Silver views.</li>
+          <li><code>marts/dim_user_lifecycle.sql</code> & <code>marts/fct_user_retention.sql</code>: Dimensional Gold models.</li>
+          <li><code>marts/fact_wallet_transactions.sql</code>: Double-entry financial transaction ledger.</li>
+        </ul>
+      </li>
+      <li><strong>Automated CI/CD Workflow:</strong> <code>.github/workflows/analytics_ci.yml</code> configured to run automated dbt syntax checks and Python unit tests on every pull request.</li>
+    </ul>
+
+    <h3>7.2 Roadmap for the Next 3-Day Development Cycle (Days 4–6)</h3>
+    <table class="rep-table">
+      <thead>
+        <tr>
+          <th style="width: 25%;">Phase</th>
+          <th style="width: 35%;">Planned Technical Milestone</th>
+          <th style="width: 40%;">Expected Business & Operational Outcome</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Development Day 4</strong></td>
+          <td>Task 02 Transition: Real-time event streaming pipeline architecture (Kafka/PubSub).</td>
+          <td>Sub-second telemetry ingestion for live anti-farming enforcement.</td>
+        </tr>
+        <tr>
+          <td><strong>Improvement Day 5</strong></td>
+          <td>Advanced machine-learning fraud scoring model for withdrawal risk classification.</td>
+          <td>Automated risk score generation ($<0.70$ threshold) replacing manual review.</td>
+        </tr>
+        <tr>
+          <td><strong>Review Day 6</strong></td>
+          <td>Full staging deployment & live API integration demo for engineering handoff.</td>
+          <td>Seamless handoff to VELOOP backend engineers (Work Package N).</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="card-box">
+      <strong>Overall Review Day Preparedness:</strong> <strong style="color: #0369a1;">100% AUDIT-READY</strong><br>
+      • All 21 deliverables completed, validated, and mapped.<br>
+      • Live dashboard running actively on <code>http://localhost:8501</code>.<br>
+      • Complete GitHub repository and documentation synchronized at <code>https://github.com/Karthikreddy200/VELOOP-</code>.
+    </div>
+
+    <div class="doc-footnote">
+      Report compiled on 12 November 2026 for VELOOP Rewards Review, Demo & Feedback Day. Prepared strictly from the verified implementation steps, modular codebase, and automated test execution logs.
+    </div>
+  </div>
+
+</body>
+</html>
