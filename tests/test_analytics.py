@@ -21,7 +21,10 @@ from src.analytics.referral_attribution import (
 from src.governance.pii_masking import (
     hash_identifier,
     mask_email_format_preserving,
-    mask_ip_address
+    mask_phone_number,
+    mask_ip_address,
+    tokenize_device_id,
+    audit_dataset_pii_compliance
 )
 from src.ingestion.event_streaming_engine import (
     EventSchemaValidator,
@@ -29,6 +32,11 @@ from src.ingestion.event_streaming_engine import (
     generate_sample_telemetry_event
 )
 from src.analytics.fraud_risk_scorer import FraudRiskScorer
+from src.analytics.persistent_ledger import (
+    record_persistent_transaction,
+    fetch_persisted_ledger,
+    compute_persisted_account_balances
+)
 
 def validate_withdrawal(user_status, available_usd, requested_usd, min_threshold=5.0, fee_pct=0.02):
     if user_status in ['Suspended', 'Banned']:
@@ -318,6 +326,58 @@ class TestVELOOPAnalyticsEngine(unittest.TestCase):
         self.assertGreaterEqual(res["composite_risk_score"], 0.70)
         self.assertTrue(res["is_blocked"])
         self.assertEqual(res["routing_queue"], "SECURITY_LOCKOUT_QUEUE")
+
+    # ==========================================
+    # PERSISTENT FINANCIAL LEDGER & PII GOVERNANCE TESTS
+    # ==========================================
+    def test_persistent_ledger_commit_and_fetch(self):
+        tx_id = "tx_test_persist_001"
+        success = record_persistent_transaction(
+            transaction_id=tx_id,
+            user_id="USR-8801",
+            event_type="REWARD_EARNED",
+            direction="CREDIT",
+            currency_unit="XP",
+            gross_amount=100.0,
+            equivalent_usd=1.00,
+            running_balance_after=250.0,
+            debit_account="1010_CASH_AND_AD_RECEIVABLES",
+            credit_account="2010_USER_WALLET_LIABILITY",
+            variance=0.0000
+        )
+        self.assertTrue(success)
+        records = fetch_persisted_ledger(limit=10)
+        found = any(r["transaction_id"] == tx_id for r in records)
+        self.assertTrue(found, "Persisted transaction must exist in SQLite database")
+
+    def test_persistent_ledger_reconciliation_zero_variance(self):
+        stats = compute_persisted_account_balances()
+        self.assertIn("is_balanced", stats)
+        self.assertTrue(stats["is_balanced"], "Double-entry cumulative variance must be 0.0000 USD")
+        self.assertEqual(stats["cumulative_variance_usd"], 0.0)
+
+    def test_pii_phone_masking(self):
+        masked1 = mask_phone_number("+91 9876543210")
+        self.assertTrue(masked1.startswith("+91 98*****"))
+        self.assertTrue(masked1.endswith("210"))
+        
+        token = tokenize_device_id("IMEI_864209048123456")
+        self.assertTrue(token.startswith("DEV_TOK_"))
+        self.assertEqual(len(token), 24)
+
+    def test_pii_dataset_compliance_audit(self):
+        # 1. Clean analytical columns
+        clean_cols = ["user_id", "masked_email", "masked_phone", "account_status", "xp_balance"]
+        res = audit_dataset_pii_compliance(clean_cols)
+        self.assertTrue(res["is_gdpr_dpdp_compliant"])
+        self.assertEqual(res["compliance_rating"], "PASS_GRADE_A")
+
+        # 2. Leaked raw confidential columns
+        dirty_cols = ["user_id", "raw_phone", "password", "aadhaar"]
+        res_dirty = audit_dataset_pii_compliance(dirty_cols)
+        self.assertFalse(res_dirty["is_gdpr_dpdp_compliant"])
+        self.assertEqual(res_dirty["compliance_rating"], "FAIL_GRADE_F")
+        self.assertEqual(len(res_dirty["violations_detected"]), 3)
 
 
 if __name__ == '__main__':
