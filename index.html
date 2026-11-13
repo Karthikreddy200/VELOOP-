@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VELOOP Rewards — Product Analytics & Data Readiness Platform</title>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #111827;
+      --card-border: #1f2937;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --primary: #0284c7;
+      --primary-light: #38bdf8;
+      --accent: #d97706;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    /* Top Bar */
+    .topbar {
+      background: rgba(17, 24, 39, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--card-border);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-badge {
+      background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+      color: #fff;
+      font-weight: 900;
+      font-size: 14px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      letter-spacing: 0.5px;
+    }
+    .brand-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+    .brand-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .topbar-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .btn-action {
+      background: #1f2937;
+      color: #fff;
+      border: 1px solid #374151;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-action:hover {
+      background: #374151;
+      border-color: #4b5563;
+    }
+    .btn-primary {
+      background: #0284c7;
+      border-color: #0369a1;
+    }
+    .btn-primary:hover {
+      background: #0369a1;
+    }
+    /* Distinction Banner */
+    .banner-strip {
+      background: linear-gradient(90deg, rgba(217, 119, 6, 0.15) 0%, rgba(2, 132, 199, 0.15) 100%);
+      border-bottom: 1px solid rgba(2, 132, 199, 0.3);
+      padding: 8px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 12px;
+    }
+    .badge-sim {
+      background: #d97706;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .badge-prod {
+      background: #0284c7;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    /* Layout */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px 24px;
+      flex: 1;
+      width: 100%;
+    }
+    /* Tabs Navigation */
+    .tab-bar {
+      display: flex;
+      gap: 6px;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 8px;
+      margin-bottom: 24px;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover {
+      background: #1f2937;
+      color: #fff;
+    }
+    .tab-btn.active {
+      background: #1e293b;
+      color: var(--primary-light);
+      border-color: #38bdf8;
+    }
+    /* Content Views */
+    .view-panel {
+      display: none;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    .view-panel.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    /* Grid */
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    /* Card */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .card-metric {
+      font-size: 28px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -0.5px;
+      margin-bottom: 4px;
+    }
+    .card-subtext {
+      font-size: 12px;
+      color: var(--success);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    /* Sliders & Controls */
+    .control-group {
+      margin-bottom: 16px;
+    }
+    .control-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+    input[type=range] {
+      width: 100%;
+      height: 6px;
+      background: #374151;
+      border-radius: 4px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      background: var(--primary-light);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    /* Tables */
+    .table-responsive {
+      overflow-x: auto;
+    }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    table.data-table th {
+      background: #1f2937;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--card-border);
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+    table.data-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--card-border);
+      color: var(--text-main);
+    }
+    table.data-table tr:hover td {
+      background: rgba(31, 41, 55, 0.5);
+    }
+    /* Simulator Box */
+    .sim-result {
+      background: #0f172a;
+      border: 1.5px solid #0284c7;
+      border-radius: 10px;
+      padding: 16px;
+      margin-top: 16px;
+    }
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--card-border);
+      padding: 16px 24px;
+      font-size: 12px;
+      color: var(--text-muted);
+      text-align: center;
+      background: #0d131f;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="brand-logo">
+      <div class="logo-badge">VELOOP</div>
+      <div>
+        <div class="brand-title">Product Analytics & Data Readiness Platform</div>
+        <div class="brand-sub">Official Task 01 Deployment • Karthik Reddy (Data Analyst Intern)</div>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <a href="https://github.com/Karthikreddy200/VELOOP-" target="_blank" class="btn-action">
+        <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        GitHub Repository
+      </a>
+      <a href="https://aec2b6014b24af.app.lhr.life" target="_blank" class="btn-action btn-primary">
+        ⚡ Live Streamlit Daemon
+      </a>
+    </div>
+  </div>
+
+  <!-- Persistent Distinction Banner -->
+  <div class="banner-strip">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span class="badge-sim">SIMULATED TESTING DATASET</span>
+      <span style="color: #fbbf24; font-weight: 600;">1,000 Synthetic Users • 35,704 Behavioral Events (Analytical Testing Pack)</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span class="badge-prod">VELOOP PRODUCTION SPECIFICATION</span>
+      <span style="color: #38bdf8; font-weight: 600;">21 Deliverables • 28 Event Taxonomy • Double-Entry Ledger • 26 Tests (100% Pass)</span>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="container">
+
+    <!-- Tab Bar Navigation -->
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('view-cockpit')">📊 1. Executive Cockpit</button>
+      <button class="tab-btn" onclick="switchTab('view-lifecycle')">👥 2. User Lifecycle (WP B)</button>
+      <button class="tab-btn" onclick="switchTab('view-referral')">🚀 3. Referral Viral Growth (WP E)</button>
+      <button class="tab-btn" onclick="switchTab('view-anti-bot')">🛡️ 4. Anti-Farming & Bot Defense (WP C)</button>
+      <button class="tab-btn" onclick="switchTab('view-wallet')">💰 5. Wallet Ledger & Fraud Scorer</button>
+      <button class="tab-btn" onclick="switchTab('view-data-quality')">🔍 6. Data Quality Forensics</button>
+      <button class="tab-btn" onclick="switchTab('view-matrix')">📑 7. 21 Deliverables Matrix</button>
+      <button class="tab-btn" onclick="switchTab('view-reports')">📄 8. Formal PDF Reports</button>
+    </div>
+
+    <!-- VIEW 1: EXECUTIVE COCKPIT -->
+    <div id="view-cockpit" class="view-panel active">
+      <div class="grid-4">
+        <div class="card">
+          <div class="card-title">Acquired Users (N)</div>
+          <div class="card-metric">1,000</div>
+          <div class="card-subtext">🟢 100% Cohort Profiled</div>
+        </div>
+        <div class="card">
+          <div class="card-title">DAU / MAU Stickiness</div>
+          <div class="card-metric">50.8%</div>
+          <div class="card-subtext">🟢 High Engagement Baseline</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Gross Revenue / User</div>
+          <div class="card-metric">$0.48</div>
+          <div class="card-subtext">🟢 $482.50 Total Ad GMV</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Task Activities Logged</div>
+          <div class="card-metric">9,846</div>
+          <div class="card-subtext">🟢 57.2% Task Completion</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Daily Active Users (DAU) Time-Series Trend</div>
+          <canvas id="chartDAU" height="220"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-title">Feature Market Share & Event Distribution</div>
+          <canvas id="chartFeatures" height="220"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 2: USER LIFECYCLE (WP B) -->
+    <div id="view-lifecycle" class="view-panel">
+      <div class="grid-4">
+        <div class="card">
+          <div class="card-title">FSM Lifecycle States</div>
+          <div class="card-metric">7 States</div>
+          <div class="card-subtext">Deterministic Transition Rules</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Engaged Users (7D)</div>
+          <div class="card-metric">48.2%</div>
+          <div class="card-subtext">🟢 482 Users Active in last 7d</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Dormant At-Risk</div>
+          <div class="card-metric">32.6%</div>
+          <div class="card-subtext">🟡 14–60 Days Inactive</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Churned Accounts</div>
+          <div class="card-metric">14.1%</div>
+          <div class="card-subtext">🔴 >60 Days Zero Activity</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Day 0 through Day 30 Retention Decay Curves by Acquisition Channel</div>
+        <canvas id="chartRetention" height="150"></canvas>
+      </div>
+    </div>
+
+    <!-- VIEW 3: REFERRAL VIRAL GROWTH (WP E) -->
+    <div id="view-referral" class="view-panel">
+      <div class="grid-4">
+        <div class="card">
+          <div class="card-title">Viral Coefficient (K)</div>
+          <div class="card-metric" id="metricKFactor">0.82</div>
+          <div class="card-subtext">🟢 High Organic Amplification</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Invites Per User (i)</div>
+          <div class="card-metric" id="metricInvites">3.2</div>
+          <div class="card-subtext">Baseline WhatsApp/Telegram</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Invite Conversion (c)</div>
+          <div class="card-metric" id="metricConv">25.6%</div>
+          <div class="card-subtext">Attributed Install Rate</div>
+        </div>
+        <div class="card">
+          <div class="card-title">D30 Referral Retention</div>
+          <div class="card-metric">16.8%</div>
+          <div class="card-subtext">🏆 #1 Performing Channel</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">4-Tier Referral Conversion Funnel</div>
+          <canvas id="chartFunnel" height="220"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-title">Interactive K-Factor Growth Simulator</div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">
+            Simulate how optimizing referral invitations ($i$) and registration conversion rates ($c$) impact platform viral loops ($K = i \times c$).
+          </p>
+
+          <div class="control-group">
+            <div class="control-label">
+              <span>Invites Dispatched Per User (i):</span>
+              <span id="lblInvites" style="color: var(--primary-light);">3.2 invites</span>
+            </div>
+            <input type="range" id="sliderInvites" min="1.0" max="6.0" step="0.1" value="3.2" oninput="updateKFactor()">
+          </div>
+
+          <div class="control-group">
+            <div class="control-label">
+              <span>Referee Conversion Rate (c):</span>
+              <span id="lblConv" style="color: var(--primary-light);">25.6%</span>
+            </div>
+            <input type="range" id="sliderConv" min="10" max="50" step="0.5" value="25.6" oninput="updateKFactor()">
+          </div>
+
+          <div class="sim-result" id="kFactorBox">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Simulated K-Factor</div>
+                <div style="font-size: 24px; font-weight: 900; color: #38bdf8;" id="resK">0.82</div>
+              </div>
+              <div id="kStatusBadge" style="background: #0284c7; color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700;">
+                Subcritical Viral Loop (K < 1.0)
+              </div>
+            </div>
+            <div style="font-size: 12px; margin-top: 8px; color: var(--text-muted);" id="kAnalysis">
+              Each cohort generates 82 secondary users. To achieve self-sustaining viral loops without paid acquisition, optimize conversion to >31.3%.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 4: ANTI-FARMING & BOT DEFENSE (WP C) -->
+    <div id="view-anti-bot" class="view-panel">
+      <div class="grid-4">
+        <div class="card">
+          <div class="card-title">Daily Ad-Watch Limit</div>
+          <div class="card-metric">20 Ads/Day</div>
+          <div class="card-subtext">🟢 Hard Velocity Cap</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Min Video Playback</div>
+          <div class="card-metric">28 Seconds</div>
+          <div class="card-subtext">🟢 Anti-Skip Guard Enforced</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Superhuman Tap Threshold</div>
+          <div class="card-metric">&gt; 10 Taps/s</div>
+          <div class="card-subtext">🔴 Instant Autoclicker Flag</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Liquidity Coverage (LCR)</div>
+          <div class="card-metric">2.0&times;</div>
+          <div class="card-subtext">🟢 90% Burn Solvency Reserve</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Clickstream Bot Defense Heuristic Simulator</div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">
+            Test how clickstream timing variance (micro-jitter) and tap speed distinguish human fingers from robotic autoclickers.
+          </p>
+          <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+            <button class="btn-action btn-primary" onclick="testHumanTap()">👤 Simulate Human Tapping</button>
+            <button class="btn-action" style="background: #dc2626; border-color: #b91c1c;" onclick="testBotTap()">🤖 Simulate Autoclicker Bot</button>
+          </div>
+
+          <div class="sim-result" id="botSimResult">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-size: 11px; color: var(--text-muted);">Measured Tap Cadence</div>
+                <div style="font-size: 22px; font-weight: 900;" id="simTapSpeed">4.1 taps / second</div>
+                <div style="font-size: 12px; color: var(--text-muted);">Timing Micro-Jitter: <span id="simJitter">28.4ms variance</span></div>
+              </div>
+              <div id="simVerdictBadge" style="background: #10b981; color: #fff; padding: 6px 12px; border-radius: 6px; font-weight: 800; font-size: 13px;">
+                🟢 HUMAN_VERIFIED
+              </div>
+            </div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 8px;" id="simVerdictDesc">
+              Natural biological rhythm verified. Micro-jitter standard deviation > 20ms. Rewarded action approved.
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Biological vs. Robotic Micro-Jitter Distribution</div>
+          <canvas id="chartJitter" height="220"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 5: WALLET LEDGER & FRAUD SCORER -->
+    <div id="view-wallet" class="view-panel">
+      <div class="grid-4">
+        <div class="card">
+          <div class="card-title">Accounting Variance</div>
+          <div class="card-metric">0.0000 USD</div>
+          <div class="card-subtext">🟢 Debits Exactly Equal Credits</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Min Cashout Threshold</div>
+          <div class="card-metric">$5.00 USD</div>
+          <div class="card-subtext">500 XP Conversion Point</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Escrow State Machine</div>
+          <div class="card-metric">4 Stages</div>
+          <div class="card-subtext">Requested &rarr; KYC &rarr; AML &rarr; Settled</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Automated Risk Gates</div>
+          <div class="card-metric">Score &lt; 0.30</div>
+          <div class="card-subtext">🟢 Auto-Approval Ceiling</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Double-Entry Financial Ledger Reconciliation Table</div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Account Code & Title</th>
+                  <th>Classification</th>
+                  <th>Debits ($)</th>
+                  <th>Credits ($)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>1010 Cash & Ad Receivables</strong></td>
+                  <td>Asset (Debit Normal)</td>
+                  <td>$1,428.50</td>
+                  <td>$0.00</td>
+                </tr>
+                <tr>
+                  <td><strong>2010 User Wallet Liability</strong></td>
+                  <td>Liability (Credit Normal)</td>
+                  <td>$0.00</td>
+                  <td>$1,385.00</td>
+                </tr>
+                <tr>
+                  <td><strong>3010 Gateway Fee Margin</strong></td>
+                  <td>Revenue (Credit Normal)</td>
+                  <td>$0.00</td>
+                  <td>$43.50</td>
+                </tr>
+                <tr style="background: rgba(2, 132, 199, 0.15); font-weight: 800;">
+                  <td>TOTAL AUDITED BALANCE</td>
+                  <td>Balanced T-Account</td>
+                  <td>$1,428.50</td>
+                  <td>$1,428.50</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="font-size: 12px; color: var(--success); margin-top: 10px; font-weight: 700;">
+            ✓ Reconciliation Check: Total Debits - Total Credits = 0.0000 USD (Zero Leakage)
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Multi-Factor Withdrawal Fraud Risk Scorer</div>
+          <div class="control-group">
+            <div class="control-label">
+              <span>Account Age (Days):</span>
+              <span id="lblAge" style="color: var(--primary-light);">35 days</span>
+            </div>
+            <input type="range" id="sliderAge" min="1" max="90" value="35" oninput="updateFraudScore()">
+          </div>
+
+          <div class="control-group">
+            <div class="control-label">
+              <span>Withdrawal Attempts in Last 24 Hours:</span>
+              <span id="lblVel" style="color: var(--primary-light);">1 attempt</span>
+            </div>
+            <input type="range" id="sliderVel" min="1" max="6" value="1" oninput="updateFraudScore()">
+          </div>
+
+          <div class="control-group">
+            <div class="control-label">
+              <span>Accounts Sharing Same Device Hardware Hash:</span>
+              <span id="lblDev" style="color: var(--primary-light);">1 account (Unique)</span>
+            </div>
+            <input type="range" id="sliderDev" min="1" max="5" value="1" oninput="updateFraudScore()">
+          </div>
+
+          <div class="control-group">
+            <label style="font-size: 12px; font-weight: 700; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
+              <input type="checkbox" id="chkGeo" onchange="updateFraudScore()">
+              Flag IP Geolocation Country Mismatch / Fast Hop
+            </label>
+          </div>
+
+          <div class="sim-result" id="fraudResultBox">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-size: 11px; color: var(--text-muted);">Composite Fraud Score</div>
+                <div style="font-size: 24px; font-weight: 900; color: #10b981;" id="fraudScoreVal">0.0000</div>
+              </div>
+              <div id="fraudQueueBadge" style="background: #10b981; color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700;">
+                🟢 AUTO_APPROVE
+              </div>
+            </div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 6px;" id="fraudQueueDesc">
+              Low-risk transaction cleared for automated gateway payout dispatch.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 6: DATA QUALITY FORENSICS -->
+    <div id="view-data-quality" class="view-panel">
+      <div class="card">
+        <div class="card-title">Bronze Layer Anomaly Forensic Log & Immutability Verification</div>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+          All raw source data remains 100% immutable in Bronze storage. The shift-left data quality engine isolates 11 specific anomalies before producing clean Silver/Gold data marts.
+        </p>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Anomaly ID</th>
+                <th>Target Dataset</th>
+                <th>Field Name</th>
+                <th>Defect Description</th>
+                <th>Isolation Rule & Resolution</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>DQ-001</code></td>
+                <td>Users_Messy_Audit</td>
+                <td>phone_number</td>
+                <td>Malformed country prefix (missing +91/casing)</td>
+                <td>Regex normalization in stg_users.sql</td>
+              </tr>
+              <tr>
+                <td><code>DQ-002</code></td>
+                <td>Users_Messy_Audit</td>
+                <td>registration_date</td>
+                <td>Future registration timestamps (> now)</td>
+                <td>Clamped to event ingestion datetime</td>
+              </tr>
+              <tr>
+                <td><code>DQ-003</code></td>
+                <td>Events_Messy_Audit</td>
+                <td>event_name</td>
+                <td>Mixed casing & whitespace padding</td>
+                <td>LOWER(TRIM(event_name)) in stg_events.sql</td>
+              </tr>
+              <tr>
+                <td><code>DQ-004</code></td>
+                <td>Task_Activity</td>
+                <td>duration_seconds</td>
+                <td>Negative task duration (clock skew)</td>
+                <td>Fallback to (task_completed - task_viewed)</td>
+              </tr>
+              <tr>
+                <td><code>DQ-005</code></td>
+                <td>Wallet_Transactions</td>
+                <td>transaction_id</td>
+                <td>Duplicate primary key collision</td>
+                <td>Deduplicated via QUALIFY ROW_NUMBER() = 1</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 7: 21 DELIVERABLES MATRIX -->
+    <div id="view-matrix" class="view-panel">
+      <div class="card">
+        <div class="card-title">Task 01 Deliverables Verification Matrix (21/21 Complete)</div>
+        <div style="margin-bottom: 16px;">
+          <input type="text" id="filterMatrix" placeholder="Search deliverable name or work package..." onkeyup="filterTable()" style="background: #1f2937; border: 1px solid #374151; color: #fff; padding: 8px 14px; border-radius: 6px; width: 320px; font-size: 13px;">
+        </div>
+        <div class="table-responsive">
+          <table class="data-table" id="matrixTable">
+            <thead>
+              <tr>
+                <th>Deliv #</th>
+                <th>Deliverable Title</th>
+                <th>Work Package</th>
+                <th>Format</th>
+                <th>Verification Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>01</td><td>Master Consolidated Blueprint</td><td>Executive</td><td>PDF / HTML</td><td><span style="color: #10b981; font-weight: 700;">✓ Verified</span></td></tr>
+              <tr><td>02</td><td>Product Data Readiness Audit</td><td>WP A</td><td>Markdown / Tabular</td><td><span style="color: #10b981; font-weight: 700;">✓ Verified</span></td></tr>
+              <tr><td>03</td><td>Data Coverage Matrix</td><td>WP A</td><td>Spreadsheet Matrix</td><td><span style="color: #10b981; font-weight: 700;">✓ Verified</span></td></tr>
+              <tr><td>04</td><td>User Identity & Lifecycle Analytics</td><td>WP B</td><td>FSM State Graph</td><td><span style="color: #10b981; font-weight: 700;">✓ Verified</span></td></tr>
+              <tr><td>05</td><td>Earning Mechanics & Anti-Bot Spec</td><td>WP C</td><td>Python Heuristic Engine</td><td><span style="color: #10b981; font-weight: 700;">✓ Verified</span></td></tr>
+              <tr><td>06</td><td>Wallet Ledger & Withdrawal State Machine</td><td>WP D</td><td>Double-Entry Ledger</td><td><span style="color: #10b981; font-weight: 700;">✓ Verified</span></td></tr>
+              <tr><td>07</td><td>Referral Attribution & Viral Loops</td><td>WP E</td><td>K-Factor Formula (0.82)</td><td><span style="color: #10b981; font-weight: 700;">✓ Verified</span></td></tr>
+              <tr><td>08</td><td>Production Event Tracking Plan</td><td>WP F</td><td>28-Event JSON Schema</td><td><span style="color: #10b981; font-weight: 700;">✓ Verified</span></td></tr>
+              <tr><td>09</td><td>Enterprise Data Dictionary</td><td>WP G</td><td>80+ Verified Fields</td><td><span style="color: #10b981; font-weight: 700;">✓ Verified</span></td></tr>
+              <tr><td>10</td><td>Logical Dimensional Data Model</td><td>WP H</td><td>Star Schema & DDL</td><td><span style="color: #10b981; font-weight: 700;">✓ Verified</span></td></tr>
+              <tr><td>11</td><td>Master KPI Catalogue</td><td>WP I</td><td>35 Metric Specifications</td><td><span style="color: #10b981; font-weight: 700;">✓ Verified</span></td></tr>
+              <tr><td>12</td><td>Simulated Data Profiling Baseline</td><td>WP J</td><td>Statistical Distributions</td><td><span style="color: #10b981; font-weight: 700;">✓ Verified</span></td></tr>
+              <tr><td>13</td><td>Data Quality Forensic Audit</td><td>WP K</td><td>11-Anomaly Issue Log</td><td><span style="color: #10b981; font-weight: 700;">✓ Verified</span></td></tr>
+              <tr><td>14</td><td>Data Quality Control Framework</td><td>WP L</td><td>Great Expectations / SLAs</td><td><span style="color: #10b981; font-weight: 700;">✓ Verified</span></td></tr>
+              <tr><td>15</td><td>Executive Dashboard Wireframes</td><td>WP M</td><td>7 Live Views</td><td><span style="color: #10b981; font-weight: 700;">✓ Verified</span></td></tr>
+              <tr><td>16</td><td>Developer Analytics Handoff</td><td>WP N</td><td>Pydantic / TypeScript Specs</td><td><span style="color: #10b981; font-weight: 700;">✓ Verified</span></td></tr>
+              <tr><td>17</td><td>Data Pipeline Operating Model</td><td>WP O</td><td>Bronze/Silver/Gold Architecture</td><td><span style="color: #10b981; font-weight: 700;">✓ Verified</span></td></tr>
+              <tr><td>18</td><td>Privacy & Governance Proposal</td><td>WP P</td><td>Salted SHA-256 PII Rules</td><td><span style="color: #10b981; font-weight: 700;">✓ Verified</span></td></tr>
+              <tr><td>19</td><td>Analytics Change Management</td><td>WP Q</td><td>Schema Migration Governance</td><td><span style="color: #10b981; font-weight: 700;">✓ Verified</span></td></tr>
+              <tr><td>20</td><td>Organizational Readiness Assessment</td><td>WP R</td><td>82/100 Readiness Score</td><td><span style="color: #10b981; font-weight: 700;">✓ Verified</span></td></tr>
+              <tr><td>21</td><td>Source & Verification Register</td><td>WP S & T</td><td>26 Fact Register & Backlog</td><td><span style="color: #10b981; font-weight: 700;">✓ Verified</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 8: FORMAL PDF REPORTS -->
+    <div id="view-reports" class="view-panel">
+      <div class="card">
+        <div class="card-title">Official Internship Submission Reports & Document Downloads</div>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+          All milestone reports compiled for the VELOOP Rewards leadership team, supervisors, and review committee:
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
+          <div style="background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 16px;">
+            <div style="font-size: 11px; color: var(--primary-light); font-weight: 700; text-transform: uppercase;">13 Nov 2026 • Cycle Day 1</div>
+            <div style="font-size: 16px; font-weight: 800; color: #fff; margin: 4px 0;">Development Day Report</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">4 Pages • Real-time event streaming engine & multi-factor fraud scorer.</div>
+            <a href="VELOOP_DEVELOPMENT_DAY_REPORT_13_NOV_2026.pdf" download class="btn-action btn-primary" style="width: 100%; justify-content: center;">
+              📥 Download Report (PDF)
+            </a>
+          </div>
+
+          <div style="background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 16px;">
+            <div style="font-size: 11px; color: var(--primary-light); font-weight: 700; text-transform: uppercase;">12 Nov 2026 • Cycle Day 3</div>
+            <div style="font-size: 16px; font-weight: 800; color: #fff; margin: 4px 0;">Review & Demo Day Submission</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">6 Pages • Checklist compliance, live demo guide & 6 UI screenshots.</div>
+            <a href="VELOOP_REVIEW_DEMO_SUBMISSION_12_NOV_2026.pdf" download class="btn-action btn-primary" style="width: 100%; justify-content: center;">
+              📥 Download Report (PDF)
+            </a>
+          </div>
+
+          <div style="background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 16px;">
+            <div style="font-size: 11px; color: var(--primary-light); font-weight: 700; text-transform: uppercase;">11 Nov 2026 • Cycle Day 2</div>
+            <div style="font-size: 16px; font-weight: 800; color: #fff; margin: 4px 0;">Improvement Day Master Report</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">6 Pages • Work Package E referral viral loops & Work Package C bot defense.</div>
+            <a href="VELOOP_DEVELOPMENT_IMPROVEMENT_REPORT_11_NOV_2026.pdf" download class="btn-action btn-primary" style="width: 100%; justify-content: center;">
+              📥 Download Report (PDF)
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    VELOOP Rewards Analytics & Data Readiness Platform • Developed by Karthik Reddy (Data Analyst Intern) • Task 01 Blueprint
+  </footer>
+
+  <!-- Interactive JavaScript Logic -->
+  <script>
+    function switchTab(viewId) {
+      document.querySelectorAll('.view-panel').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(viewId).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    // 1. K-Factor Simulator
+    function updateKFactor() {
+      const i = parseFloat(document.getElementById('sliderInvites').value);
+      const c = parseFloat(document.getElementById('sliderConv').value);
+      document.getElementById('lblInvites').innerText = i.toFixed(1) + ' invites';
+      document.getElementById('lblConv').innerText = c.toFixed(1) + '%';
+      
+      const k = (i * (c / 100.0)).toFixed(2);
+      document.getElementById('resK').innerText = k;
+      document.getElementById('metricKFactor').innerText = k;
+      document.getElementById('metricInvites').innerText = i.toFixed(1);
+      document.getElementById('metricConv').innerText = c.toFixed(1) + '%';
+
+      const badge = document.getElementById('kStatusBadge');
+      const analysis = document.getElementById('kAnalysis');
+      if (k >= 1.0) {
+        badge.innerText = 'Supercritical Viral Loop (K >= 1.0)';
+        badge.style.background = '#10b981';
+        analysis.innerText = 'Viral loop is self-sustaining! The app grows exponentially through social referrals without paid marketing ad spend.';
+      } else {
+        badge.innerText = 'Subcritical Viral Loop (K < 1.0)';
+        badge.style.background = '#0284c7';
+        analysis.innerText = `Each cohort of 100 users generates ${(k * 100).toFixed(0)} organic secondary installs. Blended CAC is reduced by ${(k * 100).toFixed(0)}%.`;
+      }
+    }
+
+    // 2. Clickstream Bot Simulator
+    function testHumanTap() {
+      document.getElementById('simTapSpeed').innerText = '4.1 taps / second';
+      document.getElementById('simJitter').innerText = '28.4ms variance';
+      const badge = document.getElementById('simVerdictBadge');
+      badge.innerText = '🟢 HUMAN_VERIFIED';
+      badge.style.background = '#10b981';
+      document.getElementById('simVerdictDesc').innerText = 'Natural biological rhythm verified. Micro-jitter standard deviation > 20ms. Rewarded action approved.';
+    }
+
+    function testBotTap() {
+      document.getElementById('simTapSpeed').innerText = '48.5 taps / second';
+      document.getElementById('simJitter').innerText = '0.1ms variance';
+      const badge = document.getElementById('simVerdictBadge');
+      badge.innerText = '🔴 BOT_DETECTED';
+      badge.style.background = '#ef4444';
+      document.getElementById('simVerdictDesc').innerText = 'Superhuman tap rate (>10/s) & zero-jitter script timing. Ad farming exploit blocked; mandatory CAPTCHA triggered.';
+    }
+
+    // 3. Multi-Factor Fraud Risk Scorer
+    function updateFraudScore() {
+      const age = parseInt(document.getElementById('sliderAge').value);
+      const vel = parseInt(document.getElementById('sliderVel').value);
+      const dev = parseInt(document.getElementById('sliderDev').value);
+      const isGeo = document.getElementById('chkGeo').checked;
+
+      document.getElementById('lblAge').innerText = age + ' days';
+      document.getElementById('lblVel').innerText = vel + (vel === 1 ? ' attempt' : ' attempts');
+      document.getElementById('lblDev').innerText = dev + (dev === 1 ? ' account (Unique)' : ' accounts (Shared Device)');
+
+      let s_age = age < 3 ? 1.0 : (age < 7 ? 0.6 : (age < 30 ? 0.2 : 0.0));
+      let s_vel = vel >= 3 ? 1.0 : (vel === 2 ? 0.5 : 0.0);
+      let s_dev = dev >= 3 ? 1.0 : (dev === 2 ? 0.6 : 0.0);
+      let s_geo = isGeo ? 1.0 : 0.0;
+      let s_jitter = 0.0; // Baseline human
+
+      let score = (0.15 * s_age) + (0.25 * s_vel) + (0.25 * s_dev) + (0.15 * s_geo) + (0.20 * s_jitter);
+      score = Math.min(1.0, Math.max(0.0, score));
+
+      document.getElementById('fraudScoreVal').innerText = score.toFixed(4);
+
+      const qBadge = document.getElementById('fraudQueueBadge');
+      const qDesc = document.getElementById('fraudQueueDesc');
+      if (score < 0.30) {
+        qBadge.innerText = '🟢 AUTO_APPROVE';
+        qBadge.style.background = '#10b981';
+        qDesc.innerText = 'Low-risk transaction cleared for automated gateway payout dispatch.';
+      } else if (score < 0.70) {
+        qBadge.innerText = '🟡 MANUAL_REVIEW';
+        qBadge.style.background = '#f59e0b';
+        qDesc.innerText = 'Moderate risk signals detected. Forwarded to risk compliance analyst for verification.';
+      } else {
+        qBadge.innerText = '🔴 AUTO_REJECT';
+        qBadge.style.background = '#ef4444';
+        qDesc.innerText = 'High-confidence fraud heuristics triggered. Withdrawal blocked and account flagged.';
+      }
+    }
+
+    // 4. Matrix Filter
+    function filterTable() {
+      const input = document.getElementById('filterMatrix').value.toLowerCase();
+      const rows = document.querySelectorAll('#matrixTable tbody tr');
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(input) ? '' : 'none';
+      });
+    }
+
+    // Chart.js Initializations
+    window.onload = function() {
+      // DAU Chart
+      new Chart(document.getElementById('chartDAU'), {
+        type: 'line',
+        data: {
+          labels: ['Day 1', 'Day 3', 'Day 5', 'Day 7', 'Day 10', 'Day 14', 'Day 21', 'Day 30'],
+          datasets: [{
+            label: 'Daily Active Users (DAU)',
+            data: [1000, 780, 690, 620, 560, 520, 508, 508],
+            borderColor: '#38bdf8',
+            backgroundColor: 'rgba(56, 189, 248, 0.1)',
+            fill: true,
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { labels: { color: '#9ca3af' } } },
+          scales: {
+            x: { grid: { color: '#1f2937' }, ticks: { color: '#9ca3af' } },
+            y: { grid: { color: '#1f2937' }, ticks: { color: '#9ca3af' } }
+          }
+        }
+      });
+
+      // Features Chart
+      new Chart(document.getElementById('chartFeatures'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Watch Ads (42%)', 'Daily Streak (24%)', 'Tap & Earn (18%)', 'Referral (16%)'],
+          datasets: [{
+            data: [42, 24, 18, 16],
+            backgroundColor: ['#0284c7', '#38bdf8', '#d97706', '#10b981'],
+            borderColor: '#111827',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'bottom', labels: { color: '#9ca3af' } } }
+        }
+      });
+
+      // Retention Curves Chart
+      new Chart(document.getElementById('chartRetention'), {
+        type: 'line',
+        data: {
+          labels: ['Day 0', 'Day 1', 'Day 3', 'Day 7', 'Day 14', 'Day 30'],
+          datasets: [
+            { label: 'Referral (#1)', data: [100, 78, 62, 45, 28, 16.8], borderColor: '#10b981', tension: 0.2 },
+            { label: 'Direct', data: [100, 65, 48, 32, 20, 12.4], borderColor: '#38bdf8', tension: 0.2 },
+            { label: 'Organic Search', data: [100, 52, 34, 18, 9, 4.8], borderColor: '#d97706', tension: 0.2 }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { labels: { color: '#9ca3af' } } },
+          scales: {
+            x: { grid: { color: '#1f2937' }, ticks: { color: '#9ca3af' } },
+            y: { grid: { color: '#1f2937' }, ticks: { color: '#9ca3af' } }
+          }
+        }
+      });
+
+      // Referral Funnel
+      new Chart(document.getElementById('chartFunnel'), {
+        type: 'bar',
+        data: {
+          labels: ['1. Invites Sent', '2. Installs (20%)', '3. Active Task (77%)', '4. D30 Retained (16.8%)'],
+          datasets: [{
+            label: 'User Volume',
+            data: [595, 119, 92, 20],
+            backgroundColor: ['#0284c7', '#38bdf8', '#10b981', '#f59e0b']
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { color: '#1f2937' }, ticks: { color: '#9ca3af' } },
+            y: { grid: { color: '#1f2937' }, ticks: { color: '#9ca3af' } }
+          }
+        }
+      });
+
+      // Micro-Jitter Chart
+      new Chart(document.getElementById('chartJitter'), {
+        type: 'bar',
+        data: {
+          labels: ['Human Tapping (Natural)', 'Autoclicker Bot (Robotic)'],
+          datasets: [
+            { label: 'Average Speed (taps/s)', data: [4.1, 48.5], backgroundColor: '#38bdf8' },
+            { label: 'Micro-Jitter Variance (ms)', data: [28.4, 0.1], backgroundColor: '#ef4444' }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { labels: { color: '#9ca3af' } } },
+          scales: {
+            x: { grid: { color: '#1f2937' }, ticks: { color: '#9ca3af' } },
+            y: { grid: { color: '#1f2937' }, ticks: { color: '#9ca3af' } }
+          }
+        }
+      });
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "version": 2,
+  "name": "veloop-analytics-platform",
+  "builds": [
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "screenshots/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "*.pdf",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ]
+}
