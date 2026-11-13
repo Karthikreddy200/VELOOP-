@@ -23,6 +23,12 @@ from src.governance.pii_masking import (
     mask_email_format_preserving,
     mask_ip_address
 )
+from src.ingestion.event_streaming_engine import (
+    EventSchemaValidator,
+    EventStreamBuffer,
+    generate_sample_telemetry_event
+)
+from src.analytics.fraud_risk_scorer import FraudRiskScorer
 
 def validate_withdrawal(user_status, available_usd, requested_usd, min_threshold=5.0, fee_pct=0.02):
     if user_status in ['Suspended', 'Banned']:
@@ -226,6 +232,92 @@ class TestVELOOPAnalyticsEngine(unittest.TestCase):
         data_path = os.path.join(base_dir, "data", "VELoop_Rewards_Data_01.xlsx")
         self.assertTrue(os.path.exists(data_path), "Raw data source file must be preserved in data/ directory")
         self.assertGreater(os.path.getsize(data_path), 1000, "Raw data file must remain intact and non-empty")
+
+    # ==========================================
+    # REAL-TIME EVENT STREAMING & INGESTION TESTS
+    # ==========================================
+    def test_streaming_valid_event_ingestion(self):
+        buffer = EventStreamBuffer(batch_size=10)
+        event = generate_sample_telemetry_event(
+            user_id="USR-9901",
+            event_name="ad_watch_completed",
+            payload={"reward_xp": 50, "duration_seconds": 29.0}
+        )
+        success, msg = buffer.ingest(event)
+        self.assertTrue(success)
+        self.assertEqual(msg, "INGESTED_SUCCESS")
+        self.assertEqual(buffer.ingested_count, 1)
+
+    def test_streaming_schema_rejection_invalid_event_name(self):
+        buffer = EventStreamBuffer(batch_size=10)
+        event = generate_sample_telemetry_event(user_id="USR-9901", event_name="invalid_custom_event_action")
+        success, msg = buffer.ingest(event)
+        self.assertFalse(success)
+        self.assertTrue("SCHEMA_REJECTED" in msg)
+        self.assertEqual(len(buffer.dead_letter_queue), 1)
+
+    def test_streaming_idempotency_deduplication(self):
+        buffer = EventStreamBuffer(batch_size=10)
+        event = generate_sample_telemetry_event(user_id="USR-9901", event_name="daily_streak_incremented")
+        success1, _ = buffer.ingest(event)
+        success2, msg2 = buffer.ingest(event)  # Identical idempotency key
+        self.assertTrue(success1)
+        self.assertFalse(success2)
+        self.assertEqual(msg2, "DUPLICATE_IDEMPOTENCY_KEY_REJECTED")
+
+    def test_streaming_future_timestamp_drift_rejection(self):
+        from datetime import datetime, timezone, timedelta
+        buffer = EventStreamBuffer(batch_size=10)
+        future_ts = (datetime.now(timezone.utc) + timedelta(minutes=15)).isoformat()
+        event = generate_sample_telemetry_event(user_id="USR-9901", event_name="spin_wheel_initiated")
+        event["event_timestamp"] = future_ts
+        success, msg = buffer.ingest(event)
+        self.assertFalse(success)
+        self.assertTrue("Future drift" in msg)
+
+    # ==========================================
+    # MULTI-FACTOR FRAUD RISK SCORING TESTS
+    # ==========================================
+    def test_fraud_risk_scorer_auto_approve(self):
+        features = {
+            "account_age_days": 45,
+            "withdrawal_count_24h": 1,
+            "shared_device_account_count": 1,
+            "is_ip_country_mismatched": False,
+            "average_tap_micro_jitter_ms": 28.5
+        }
+        res = FraudRiskScorer.evaluate_withdrawal_risk(features)
+        self.assertEqual(res["decision"], "AUTO_APPROVE")
+        self.assertLess(res["composite_risk_score"], 0.30)
+        self.assertFalse(res["is_blocked"])
+
+    def test_fraud_risk_scorer_manual_review(self):
+        features = {
+            "account_age_days": 5,                 # Moderate risk (0.6) -> 0.09
+            "withdrawal_count_24h": 2,             # Moderate velocity (0.5) -> 0.125
+            "shared_device_account_count": 1,      # Unique device (0.0) -> 0.0
+            "is_ip_country_mismatched": False,
+            "average_tap_micro_jitter_ms": 12.0    # Borderline jitter (0.5) -> 0.10
+        }                                          # Total score = 0.315 (between 0.30 and 0.70)
+        res = FraudRiskScorer.evaluate_withdrawal_risk(features)
+        self.assertEqual(res["decision"], "MANUAL_REVIEW")
+        self.assertGreaterEqual(res["composite_risk_score"], 0.30)
+        self.assertLess(res["composite_risk_score"], 0.70)
+        self.assertEqual(res["routing_queue"], "COMPLIANCE_OPERATIONS_QUEUE")
+
+    def test_fraud_risk_scorer_auto_reject(self):
+        features = {
+            "account_age_days": 1,                 # High risk (1.0)
+            "withdrawal_count_24h": 4,             # High velocity (1.0)
+            "shared_device_account_count": 5,      # Multi-account farm (1.0)
+            "is_ip_country_mismatched": True,      # Geo hop (1.0)
+            "average_tap_micro_jitter_ms": 1.2     # Autoclicker bot (1.0)
+        }
+        res = FraudRiskScorer.evaluate_withdrawal_risk(features)
+        self.assertEqual(res["decision"], "AUTO_REJECT")
+        self.assertGreaterEqual(res["composite_risk_score"], 0.70)
+        self.assertTrue(res["is_blocked"])
+        self.assertEqual(res["routing_queue"], "SECURITY_LOCKOUT_QUEUE")
 
 
 if __name__ == '__main__':
