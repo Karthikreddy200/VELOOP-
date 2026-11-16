@@ -6,17 +6,35 @@ import hashlib
 import os
 import sys
 
-# Ensure src is on sys.path
-sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
-from src.analytics.fraud_risk_scorer import FraudRiskScorer, FraudAppealManager
-from src.ingestion.event_streaming_engine import EventStreamBuffer, generate_sample_telemetry_event
-from src.analytics.persistent_ledger import (
-    record_double_entry_transaction,
-    record_persistent_transaction,
-    fetch_persisted_ledger,
-    compute_persisted_account_balances,
-    DuplicateTransactionError
-)
+# Ensure project root and src directory are on Python sys.path
+CURRENT_DIR = os.path.abspath(os.path.dirname(__file__))
+SRC_DIR = os.path.join(CURRENT_DIR, "src")
+if CURRENT_DIR not in sys.path:
+    sys.path.insert(0, CURRENT_DIR)
+if SRC_DIR not in sys.path:
+    sys.path.insert(0, SRC_DIR)
+
+try:
+    from src.analytics.fraud_risk_scorer import FraudRiskScorer, FraudAppealManager
+    from src.ingestion.event_streaming_engine import EventStreamBuffer, generate_sample_telemetry_event
+    from src.analytics.persistent_ledger import (
+        record_double_entry_transaction,
+        record_persistent_transaction,
+        fetch_persisted_ledger,
+        compute_persisted_account_balances,
+        DuplicateTransactionError
+    )
+except (ImportError, ModuleNotFoundError):
+    from analytics.fraud_risk_scorer import FraudRiskScorer, FraudAppealManager
+    from ingestion.event_streaming_engine import EventStreamBuffer, generate_sample_telemetry_event
+    from analytics.persistent_ledger import (
+        record_double_entry_transaction,
+        record_persistent_transaction,
+        fetch_persisted_ledger,
+        compute_persisted_account_balances,
+        DuplicateTransactionError
+    )
+
 
 # Set Page Config
 st.set_page_config(
