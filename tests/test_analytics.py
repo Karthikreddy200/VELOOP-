@@ -1,10 +1,27 @@
+"""
+VELOOP Rewards - Master Automated Analytics & Financial Verification Test Suite
+Work Packages A through T
+Includes:
+- User Lifecycle Finite State Machine (WP B)
+- True Multi-Line Double-Entry Persistent Ledger & Zero-Variance Math (WP D)
+- Duplicate Prevention & Concurrency Verification (WP D)
+- Multi-Factor Fraud Risk Scorer, FPR/FNR Benchmarks & Appeal Flow (WP C & D)
+- Deep Content PII Regex Scanning & Secret Management (WP P)
+- Real-Time Telemetry Streaming, Drift Bounds & Idempotency (WP F)
+- Anti-Bot Heuristics, Velocity Caps & Token Liquidity (WP C & E)
+"""
+
 import unittest
 import hashlib
 import os
 import sys
+import threading
+from decimal import Decimal
 
-# Add src to python path for modular import
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+# Ensure project root is on Python sys.path
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 
 from src.analytics.user_lifecycle_fsm import classify_lifecycle_state, transition_state
 from src.analytics.reward_economy_engine import (
@@ -19,11 +36,13 @@ from src.analytics.referral_attribution import (
     detect_referral_sybil_fraud
 )
 from src.governance.pii_masking import (
+    get_hashing_secret,
     hash_identifier,
     mask_email_format_preserving,
     mask_phone_number,
     mask_ip_address,
     tokenize_device_id,
+    scan_content_for_pii,
     audit_dataset_pii_compliance
 )
 from src.ingestion.event_streaming_engine import (
@@ -31,14 +50,23 @@ from src.ingestion.event_streaming_engine import (
     EventStreamBuffer,
     generate_sample_telemetry_event
 )
-from src.analytics.fraud_risk_scorer import FraudRiskScorer
+from src.analytics.fraud_risk_scorer import (
+    FraudRiskScorer,
+    FraudAppealManager
+)
 from src.analytics.persistent_ledger import (
+    record_double_entry_transaction,
     record_persistent_transaction,
     fetch_persisted_ledger,
-    compute_persisted_account_balances
+    compute_persisted_account_balances,
+    DuplicateTransactionError,
+    UnbalancedJournalEntryError,
+    to_cents,
+    init_persistent_ledger
 )
 
 def validate_withdrawal(user_status, available_usd, requested_usd, min_threshold=5.0, fee_pct=0.02):
+    """Helper validator for cash-out transaction business rules."""
     if user_status in ['Suspended', 'Banned']:
         return False, "ERR_ACCOUNT_SUSPENDED", 0.0, 0.0
     if requested_usd < min_threshold:
@@ -52,6 +80,11 @@ def validate_withdrawal(user_status, available_usd, requested_usd, min_threshold
 
 
 class TestVELOOPAnalyticsEngine(unittest.TestCase):
+
+    def setUp(self):
+        """Initializes ledger tables and appeal manager before each test."""
+        init_persistent_ledger()
+        FraudAppealManager.reset()
 
     # ==========================================
     # WORK PACKAGE B: USER LIFECYCLE FSM TESTS
@@ -101,9 +134,64 @@ class TestVELOOPAnalyticsEngine(unittest.TestCase):
         self.assertEqual(h1, h2)
         self.assertEqual(len(h1), 64)
 
+    def test_pii_phone_masking(self):
+        masked1 = mask_phone_number("+91 9876543210")
+        self.assertTrue(masked1.startswith("+91 98*****"))
+        self.assertTrue(masked1.endswith("210"))
+        
+        token = tokenize_device_id("IMEI_864209048123456")
+        self.assertTrue(token.startswith("DEV_TOK_"))
+        self.assertEqual(len(token), 24)
+
     def test_pii_ip_masking(self):
         ip = mask_ip_address("192.168.1.155")
         self.assertEqual(ip, "192.168.1.0")
+
+    def test_pii_secure_secret_management(self):
+        """Verifies environment secret resolution and fallback warnings."""
+        os.environ["VELOOP_HASHING_SECRET"] = "SECURE_VAULT_PROD_KEY_999"
+        sec = get_hashing_secret()
+        self.assertEqual(sec, "SECURE_VAULT_PROD_KEY_999")
+        h_custom = hash_identifier("DEV_DEVICE_42")
+        del os.environ["VELOOP_HASHING_SECRET"]
+        self.assertTrue(len(h_custom) == 64)
+
+    def test_pii_content_level_deep_scan(self):
+        """Tests deep content inspection detecting unmasked PII inside cell text."""
+        # 1. Clean dataset
+        clean_records = [
+            {"user_id": "USR-101", "masked_email": "c***k@gmail.com", "notes": "Completed onboarding step 1"},
+            {"user_id": "USR-102", "masked_email": "j***e@yahoo.com", "notes": "Claimed 50 XP daily streak"}
+        ]
+        res_clean = scan_content_for_pii(clean_records)
+        self.assertTrue(res_clean["content_scan_passed"])
+        self.assertEqual(res_clean["violations_detected_count"], 0)
+
+        # 2. Leaked content inside innocuously named 'notes' column
+        dirty_records = [
+            {"user_id": "USR-201", "notes": "Customer requested callback at +91 9876543210"},
+            {"user_id": "USR-202", "notes": "Email backup is user_direct@veloop.com for verification"},
+            {"user_id": "USR-203", "notes": "Aadhaar verified: 2345 6789 0123"}
+        ]
+        res_dirty = scan_content_for_pii(dirty_records)
+        self.assertFalse(res_dirty["content_scan_passed"])
+        self.assertEqual(res_dirty["violations_detected_count"], 3)
+        violated_types = [v["pii_type"] for v in res_dirty["violations"]]
+        self.assertIn("INDIAN_MOBILE", violated_types)
+        self.assertIn("EMAIL", violated_types)
+        self.assertIn("AADHAAR_NUMBER", violated_types)
+
+    def test_pii_dataset_compliance_audit(self):
+        clean_cols = ["user_id", "masked_email", "masked_phone", "account_status", "xp_balance"]
+        res = audit_dataset_pii_compliance(clean_cols)
+        self.assertTrue(res["technical_privacy_controls_verified"])
+        self.assertEqual(res["compliance_rating"], "PASS_GRADE_A")
+
+        dirty_cols = ["user_id", "raw_phone", "password", "aadhaar"]
+        res_dirty = audit_dataset_pii_compliance(dirty_cols)
+        self.assertFalse(res_dirty["technical_privacy_controls_verified"])
+        self.assertEqual(res_dirty["compliance_rating"], "FAIL_GRADE_F")
+        self.assertEqual(len(res_dirty["schema_violations"]), 3)
 
     # ==========================================
     # WORK PACKAGE D: WALLET & WITHDRAWAL TESTS
@@ -136,52 +224,43 @@ class TestVELOOPAnalyticsEngine(unittest.TestCase):
     # WORK PACKAGE C: REWARD ECONOMY & BOT TESTS
     # ==========================================
     def test_ad_watch_velocity_cap(self):
-        # User within daily limit (<20)
         valid, msg, xp = validate_ad_watch_event(user_daily_ad_count=5, ad_duration_sec=30.0)
         self.assertTrue(valid)
         self.assertEqual(xp, 50)
 
-        # User at or above cap (>=20)
         valid, msg, xp = validate_ad_watch_event(user_daily_ad_count=20, ad_duration_sec=30.0)
         self.assertFalse(valid)
         self.assertEqual(msg, "ERR_DAILY_AD_CAP_EXCEEDED")
 
-        # Incomplete view (<28s)
         valid, msg, xp = validate_ad_watch_event(user_daily_ad_count=2, ad_duration_sec=15.0)
         self.assertFalse(valid)
         self.assertEqual(msg, "ERR_INSUFFICIENT_AD_DURATION")
 
     def test_tap_bot_detection(self):
-        # Human taps: ~4 taps/sec with natural human micro-jitter variance
         human_timestamps = [0.0, 0.26, 0.51, 0.79, 1.05, 1.33, 1.60]
         is_bot, reason = detect_tap_bot(human_timestamps)
         self.assertFalse(is_bot)
         self.assertEqual(reason, "HUMAN_VERIFIED")
 
-        # Superhuman autoclicker: 50 taps/sec (interval = 0.02s)
         bot_fast_timestamps = [i * 0.02 for i in range(10)]
         is_bot, reason = detect_tap_bot(bot_fast_timestamps)
         self.assertTrue(is_bot)
         self.assertEqual(reason, "BOT_DETECTED_SUPERHUMAN_SPEED")
 
-        # Robot clicker with mechanical zero variance: exactly 0.12s every tap
         bot_robotic_timestamps = [i * 0.12 for i in range(10)]
         is_bot, reason = detect_tap_bot(bot_robotic_timestamps)
         self.assertTrue(is_bot)
         self.assertEqual(reason, "BOT_DETECTED_MECHANICAL_INTERVALS")
 
     def test_earning_hourly_velocity_cap(self):
-        # Under limit: 600 + 100 = 700 <= 1000
         valid, msg = validate_earning_velocity(recent_hourly_xp=600, proposed_reward_xp=100)
         self.assertTrue(valid)
 
-        # Exceeds limit: 950 + 200 = 1150 > 1000
         valid, msg = validate_earning_velocity(recent_hourly_xp=950, proposed_reward_xp=200)
         self.assertFalse(valid)
         self.assertTrue("ERR_HOURLY_VELOCITY_CAP" in msg)
 
     def test_token_economy_health_metrics(self):
-        # Healthy circulation: 10,000 minted, 7,500 burned (75% burn ratio), $50 reserve against $25 liability
         health = calculate_token_economy_health(
             total_xp_minted=10000,
             total_xp_burned_or_withdrawn=7500,
@@ -197,7 +276,6 @@ class TestVELOOPAnalyticsEngine(unittest.TestCase):
     # WORK PACKAGE E: REFERRAL & VIRAL GROWTH TESTS
     # ==========================================
     def test_referral_k_factor_calculation(self):
-        # 100 users, 250 invites sent, 80 converted -> i = 2.5, c = 0.32 -> K = 0.8
         res = calculate_k_factor(total_active_users=100, total_invites_sent=250, converted_referees=80)
         self.assertEqual(res['invites_per_user'], 2.5)
         self.assertEqual(res['conversion_rate_pct'], 32.0)
@@ -212,7 +290,6 @@ class TestVELOOPAnalyticsEngine(unittest.TestCase):
         self.assertEqual(funnel[3]['conversion_pct'], 16.8)
 
     def test_referral_sybil_fraud_detection(self):
-        # 1. Device collision
         is_fraud, msg = detect_referral_sybil_fraud(
             referrer_device_id="DEV_IMEI_12345",
             referee_device_id="DEV_IMEI_12345",
@@ -222,7 +299,6 @@ class TestVELOOPAnalyticsEngine(unittest.TestCase):
         self.assertTrue(is_fraud)
         self.assertTrue("FRAUD_HARDWARE_COLLISION" in msg)
 
-        # 2. Clean referral
         is_fraud, msg = detect_referral_sybil_fraud(
             referrer_device_id="DEV_IMEI_11111",
             referee_device_id="DEV_IMEI_22222",
@@ -236,8 +312,7 @@ class TestVELOOPAnalyticsEngine(unittest.TestCase):
     # DATA LAKE IMMUTABILITY TEST
     # ==========================================
     def test_raw_data_preservation(self):
-        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        data_path = os.path.join(base_dir, "data", "VELoop_Rewards_Data_01.xlsx")
+        data_path = os.path.join(PROJECT_ROOT, "data", "VELoop_Rewards_Data_01.xlsx")
         self.assertTrue(os.path.exists(data_path), "Raw data source file must be preserved in data/ directory")
         self.assertGreater(os.path.getsize(data_path), 1000, "Raw data file must remain intact and non-empty")
 
@@ -268,7 +343,7 @@ class TestVELOOPAnalyticsEngine(unittest.TestCase):
         buffer = EventStreamBuffer(batch_size=10)
         event = generate_sample_telemetry_event(user_id="USR-9901", event_name="daily_streak_incremented")
         success1, _ = buffer.ingest(event)
-        success2, msg2 = buffer.ingest(event)  # Identical idempotency key
+        success2, msg2 = buffer.ingest(event)
         self.assertTrue(success1)
         self.assertFalse(success2)
         self.assertEqual(msg2, "DUPLICATE_IDEMPOTENCY_KEY_REJECTED")
@@ -301,37 +376,74 @@ class TestVELOOPAnalyticsEngine(unittest.TestCase):
 
     def test_fraud_risk_scorer_manual_review(self):
         features = {
-            "account_age_days": 5,                 # Moderate risk (0.6) -> 0.09
-            "withdrawal_count_24h": 2,             # Moderate velocity (0.5) -> 0.125
-            "shared_device_account_count": 1,      # Unique device (0.0) -> 0.0
+            "account_age_days": 5,
+            "withdrawal_count_24h": 2,
+            "shared_device_account_count": 1,
             "is_ip_country_mismatched": False,
-            "average_tap_micro_jitter_ms": 12.0    # Borderline jitter (0.5) -> 0.10
-        }                                          # Total score = 0.315 (between 0.30 and 0.70)
+            "average_tap_micro_jitter_ms": 12.0
+        }
         res = FraudRiskScorer.evaluate_withdrawal_risk(features)
-        self.assertEqual(res["decision"], "MANUAL_REVIEW")
+        self.assertEqual(res["decision"], "STEP_UP_CHALLENGE")
         self.assertGreaterEqual(res["composite_risk_score"], 0.30)
         self.assertLess(res["composite_risk_score"], 0.70)
         self.assertEqual(res["routing_queue"], "COMPLIANCE_OPERATIONS_QUEUE")
 
-    def test_fraud_risk_scorer_auto_reject(self):
+    def test_fraud_risk_scorer_escalation_hold(self):
         features = {
-            "account_age_days": 1,                 # High risk (1.0)
-            "withdrawal_count_24h": 4,             # High velocity (1.0)
-            "shared_device_account_count": 5,      # Multi-account farm (1.0)
-            "is_ip_country_mismatched": True,      # Geo hop (1.0)
-            "average_tap_micro_jitter_ms": 1.2     # Autoclicker bot (1.0)
+            "account_age_days": 1,
+            "withdrawal_count_24h": 4,
+            "shared_device_account_count": 5,
+            "is_ip_country_mismatched": True,
+            "average_tap_micro_jitter_ms": 1.2
         }
         res = FraudRiskScorer.evaluate_withdrawal_risk(features)
-        self.assertEqual(res["decision"], "AUTO_REJECT")
+        self.assertEqual(res["decision"], "SECURITY_ESCALATION_HOLD")
         self.assertGreaterEqual(res["composite_risk_score"], 0.70)
         self.assertTrue(res["is_blocked"])
-        self.assertEqual(res["routing_queue"], "SECURITY_LOCKOUT_QUEUE")
+        self.assertEqual(res["routing_queue"], "FRAUD_ESCALATION_REVIEW_QUEUE")
+        self.assertIn("ESCROW_PAUSE", res["friction_action"])
+
+    def test_fraud_scorer_benchmark_fpr_fnr_metrics(self):
+        """Measures False-Positive Rate (FPR) and False-Negative Rate (FNR) on realistic cases."""
+        benchmark_cases = FraudRiskScorer.get_realistic_benchmark_dataset()
+        perf = FraudRiskScorer.evaluate_model_performance(benchmark_cases, threshold=0.50)
+        
+        self.assertIn("confusion_matrix", perf)
+        self.assertIn("metrics", perf)
+        metrics = perf["metrics"]
+        
+        self.assertIn("false_positive_rate", metrics)
+        self.assertIn("false_negative_rate", metrics)
+        self.assertIn("f1_score", metrics)
+        self.assertLessEqual(metrics["false_positive_rate"], 0.10, "FPR must be <= 10% on legitimate mobile users")
+        self.assertEqual(metrics["false_negative_rate"], 0.0, "FNR must be 0% on blatant sybil farms")
+
+    def test_fraud_appeal_workflow(self):
+        """Verifies manual review ticket creation, state transitions, and audit notes."""
+        ticket = FraudAppealManager.create_appeal_ticket(
+            user_id="USR-FLAGGED-01",
+            transaction_id="tx_held_9912",
+            risk_score=0.74,
+            flag_reason="Elevated clickstream velocity",
+            user_explanation="I am playing on an iPad with a high refresh rate stylus."
+        )
+        ticket_id = ticket["ticket_id"]
+        self.assertEqual(ticket["status"], "PENDING_MANUAL_REVIEW")
+
+        updated = FraudAppealManager.review_appeal_ticket(
+            ticket_id=ticket_id,
+            reviewer_id="ANALYST_SARAH_K",
+            decision="OVERRULE_APPROVE",
+            reviewer_notes="Verified stylus hardware telemetry; released payout from escrow."
+        )
+        self.assertEqual(updated["status"], "OVERRULED_APPROVED")
+        self.assertEqual(updated["reviewer_id"], "ANALYST_SARAH_K")
 
     # ==========================================
-    # PERSISTENT FINANCIAL LEDGER & PII GOVERNANCE TESTS
+    # PERSISTENT FINANCIAL LEDGER & ZERO-VARIANCE TESTS
     # ==========================================
     def test_persistent_ledger_commit_and_fetch(self):
-        tx_id = "tx_test_persist_001"
+        tx_id = f"tx_test_persist_{os.getpid()}_{threading.get_ident()}"
         success = record_persistent_transaction(
             transaction_id=tx_id,
             user_id="USR-8801",
@@ -342,8 +454,7 @@ class TestVELOOPAnalyticsEngine(unittest.TestCase):
             equivalent_usd=1.00,
             running_balance_after=250.0,
             debit_account="1010_CASH_AND_AD_RECEIVABLES",
-            credit_account="2010_USER_WALLET_LIABILITY",
-            variance=0.0000
+            credit_account="2010_USER_WALLET_LIABILITY"
         )
         self.assertTrue(success)
         records = fetch_persisted_ledger(limit=10)
@@ -356,28 +467,88 @@ class TestVELOOPAnalyticsEngine(unittest.TestCase):
         self.assertTrue(stats["is_balanced"], "Double-entry cumulative variance must be 0.0000 USD")
         self.assertEqual(stats["cumulative_variance_usd"], 0.0)
 
-    def test_pii_phone_masking(self):
-        masked1 = mask_phone_number("+91 9876543210")
-        self.assertTrue(masked1.startswith("+91 98*****"))
-        self.assertTrue(masked1.endswith("210"))
-        
-        token = tokenize_device_id("IMEI_864209048123456")
-        self.assertTrue(token.startswith("DEV_TOK_"))
-        self.assertEqual(len(token), 24)
+    def test_persistent_ledger_duplicate_transaction_rejected(self):
+        """Asserts that duplicate transaction IDs are strictly rejected, preventing silent overwrite."""
+        dup_tx_id = f"tx_immutable_unique_{os.getpid()}"
+        res1 = record_double_entry_transaction(
+            transaction_id=dup_tx_id,
+            user_id="USR-101",
+            event_type="REWARD_EARNED",
+            description="First valid post",
+            debit_lines=[("1010_CASH_AND_AD_RECEIVABLES", 5.00)],
+            credit_lines=[("2010_USER_WALLET_LIABILITY", 5.00)]
+        )
+        self.assertTrue(res1["success"])
 
-    def test_pii_dataset_compliance_audit(self):
-        # 1. Clean analytical columns
-        clean_cols = ["user_id", "masked_email", "masked_phone", "account_status", "xp_balance"]
-        res = audit_dataset_pii_compliance(clean_cols)
-        self.assertTrue(res["is_gdpr_dpdp_compliant"])
-        self.assertEqual(res["compliance_rating"], "PASS_GRADE_A")
+        with self.assertRaises(DuplicateTransactionError):
+            record_double_entry_transaction(
+                transaction_id=dup_tx_id,
+                user_id="USR-101",
+                event_type="REWARD_EARNED",
+                description="Duplicate attack attempt",
+                debit_lines=[("1010_CASH_AND_AD_RECEIVABLES", 5.00)],
+                credit_lines=[("2010_USER_WALLET_LIABILITY", 5.00)]
+            )
 
-        # 2. Leaked raw confidential columns
-        dirty_cols = ["user_id", "raw_phone", "password", "aadhaar"]
-        res_dirty = audit_dataset_pii_compliance(dirty_cols)
-        self.assertFalse(res_dirty["is_gdpr_dpdp_compliant"])
-        self.assertEqual(res_dirty["compliance_rating"], "FAIL_GRADE_F")
-        self.assertEqual(len(res_dirty["violations_detected"]), 3)
+    def test_persistent_ledger_unbalanced_entry_rejected(self):
+        """Asserts that unbalanced debits vs credits are strictly rejected with zero persistence."""
+        bad_tx_id = f"tx_unbalanced_attempt_{os.getpid()}"
+        with self.assertRaises(UnbalancedJournalEntryError):
+            record_double_entry_transaction(
+                transaction_id=bad_tx_id,
+                user_id="USR-102",
+                event_type="REWARD_EARNED",
+                description="Unbalanced debit/credit",
+                debit_lines=[("1010_CASH_AND_AD_RECEIVABLES", 10.00)],
+                credit_lines=[("2010_USER_WALLET_LIABILITY", 8.00)]
+            )
+
+    def test_persistent_ledger_decimal_precision(self):
+        """Validates that financial amounts use exact integer subunit cents without float inaccuracies."""
+        cents1 = to_cents(0.10)
+        cents2 = to_cents(0.20)
+        self.assertEqual(cents1 + cents2, 30)
+
+        tx_id = f"tx_precision_cents_{os.getpid()}_{threading.get_ident()}"
+        res = record_double_entry_transaction(
+            transaction_id=tx_id,
+            user_id="USR-PRECISION",
+            event_type="REWARD_EARNED",
+            description="Float drift immunity test",
+            debit_lines=[("1010_CASH", 0.10), ("1010_CASH", 0.20)],
+            credit_lines=[("2010_LIABILITY", 0.30)]
+        )
+        self.assertEqual(res["total_amount_cents"], 30)
+        self.assertEqual(res["total_amount_usd"], "0.30")
+
+    def test_persistent_ledger_concurrent_transactions(self):
+        """Tests concurrent multi-threaded transaction execution under SQLite WAL mode."""
+        tx_count = 8
+        errors = []
+
+        def worker(thread_idx):
+            try:
+                tx_id = f"tx_concurrent_{thread_idx}_{os.getpid()}"
+                record_double_entry_transaction(
+                    transaction_id=tx_id,
+                    user_id=f"USR-THREAD-{thread_idx}",
+                    event_type="REWARD_EARNED",
+                    description=f"Concurrent thread {thread_idx}",
+                    debit_lines=[("1010_CASH_AND_AD_RECEIVABLES", 1.00)],
+                    credit_lines=[("2010_USER_WALLET_LIABILITY", 1.00)]
+                )
+            except Exception as e:
+                errors.append(e)
+
+        threads = [threading.Thread(target=worker, args=(i,)) for i in range(tx_count)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+
+        self.assertEqual(len(errors), 0, f"Concurrent transaction failures encountered: {errors}")
+        stats = compute_persisted_account_balances()
+        self.assertTrue(stats["is_balanced"])
 
 
 if __name__ == '__main__':

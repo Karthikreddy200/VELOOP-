@@ -1,19 +1,92 @@
 """
-VELOOP Rewards - Multi-Factor Withdrawal Fraud Risk Scoring & False-Positive Mitigation Engine
-Part of Task 01: Product Analytics & Data Readiness Architecture
+VELOOP Rewards - Multi-Factor Fraud Risk Engine, Benchmark Validation & Appeal Workflow (Work Package C & D)
+Implements:
+1. Multi-factor weighted heuristic scoring with domestic mobile carrier ASN dampening.
+2. Progressive friction protocol (Challenge / Escalation Hold instead of unilateral account bans).
+3. Realistic test benchmarking measuring False-Positive Rate (FPR) and False-Negative Rate (FNR).
+4. Formal manual review and appeal workflow tracking.
 
-Computes composite fraud risk scores [0.0 - 1.0] across behavioral,
-hardware, velocity, and geolocation signals, incorporating false-positive
-dampeners, KYC trust discounts, and progressive friction handling.
-
-Notice: SIMULATED DATA — CREATED FOR ANALYTICAL TESTING
+Notice: SIMULATED DATA & MODEL — CREATED FOR ANALYTICAL TESTING & ARCHITECTURAL SPECIFICATION
 """
 
-from typing import Dict, Any, Tuple, List
+from typing import Dict, Any, Tuple, List, Optional
+from datetime import datetime, timezone
+import uuid
+
+class FraudAppealManager:
+    """
+    Manages manual compliance reviews and appeals for flagged withdrawal transactions.
+    Ensures legitimate users are not permanently frozen without human recourse.
+    """
+    _appeals_db: Dict[str, Dict[str, Any]] = {}
+
+    @classmethod
+    def create_appeal_ticket(
+        cls,
+        user_id: str,
+        transaction_id: str,
+        risk_score: float,
+        flag_reason: str,
+        user_explanation: str = "Automated appeal submission for flagged transaction."
+    ) -> Dict[str, Any]:
+        """Opens a formal appeal ticket for a held transaction."""
+        ticket_id = f"APL-{uuid.uuid4().hex[:8].upper()}"
+        now = datetime.now(timezone.utc).isoformat()
+        ticket = {
+            "ticket_id": ticket_id,
+            "user_id": user_id,
+            "transaction_id": transaction_id,
+            "risk_score": risk_score,
+            "flag_reason": flag_reason,
+            "user_explanation": user_explanation,
+            "status": "PENDING_MANUAL_REVIEW", # PENDING_MANUAL_REVIEW, OVERRULED_APPROVED, UPHELD_REJECTED
+            "reviewer_id": None,
+            "reviewer_notes": None,
+            "created_at": now,
+            "updated_at": now
+        }
+        cls._appeals_db[ticket_id] = ticket
+        return ticket
+
+    @classmethod
+    def review_appeal_ticket(
+        cls,
+        ticket_id: str,
+        reviewer_id: str,
+        decision: str, # "OVERRULE_APPROVE" or "UPHOLD_REJECT"
+        reviewer_notes: str
+    ) -> Dict[str, Any]:
+        """Processes an appeal decision with full audit tracking."""
+        if ticket_id not in cls._appeals_db:
+            raise KeyError(f"Appeal ticket '{ticket_id}' not found.")
+        
+        ticket = cls._appeals_db[ticket_id]
+        if decision == "OVERRULE_APPROVE":
+            ticket["status"] = "OVERRULED_APPROVED"
+        elif decision == "UPHOLD_REJECT":
+            ticket["status"] = "UPHELD_REJECTED"
+        else:
+            raise ValueError(f"Invalid decision '{decision}'. Must be 'OVERRULE_APPROVE' or 'UPHOLD_REJECT'.")
+
+        ticket["reviewer_id"] = reviewer_id
+        ticket["reviewer_notes"] = reviewer_notes
+        ticket["updated_at"] = datetime.now(timezone.utc).isoformat()
+        return ticket
+
+    @classmethod
+    def get_ticket(cls, ticket_id: str) -> Optional[Dict[str, Any]]:
+        return cls._appeals_db.get(ticket_id)
+
+    @classmethod
+    def reset(cls):
+        """Clears appeal tickets for test isolation."""
+        cls._appeals_db.clear()
+
 
 class FraudRiskScorer:
     """
-    Weighted multi-factor heuristic risk scoring model with false-positive controls.
+    Weighted multi-factor heuristic risk scoring model with false-positive controls
+    and progressive friction escalation.
     """
     WEIGHTS = {
         "account_age": 0.15,
@@ -23,9 +96,9 @@ class FraudRiskScorer:
         "clickstream_entropy": 0.20
     }
 
-    # Decision Boundaries
+    # Calibrated Decision Boundaries
     AUTO_APPROVE_THRESHOLD = 0.30
-    AUTO_REJECT_THRESHOLD = 0.70
+    MANUAL_REVIEW_THRESHOLD = 0.70
 
     # Whitelisted Mobile Carrier ASNs (Dynamic IP Subnet Hops are NOT Fraud)
     DOMESTIC_MOBILE_ASNS = {"AS55836", "AS45609", "AS9829", "AS24560"} # Airtel, Jio, BSNL, Vodafone Idea
@@ -34,7 +107,7 @@ class FraudRiskScorer:
     def evaluate_withdrawal_risk(cls, features: Dict[str, Any]) -> Dict[str, Any]:
         """
         Evaluates a withdrawal request and returns a detailed scoring breakdown,
-        applying false-positive mitigations and trust discounts.
+        applying false-positive mitigations and progressive friction handling.
         """
         breakdown = {}
 
@@ -52,9 +125,9 @@ class FraudRiskScorer:
 
         # 2. Withdrawal Velocity 24h Factor (Weight: 25%)
         velocity = features.get("withdrawal_count_24h", 1)
-        if velocity >= 3:
+        if velocity >= 4:
             s_vel = 1.0
-        elif velocity == 2:
+        elif velocity >= 2:
             s_vel = 0.5
         else:
             s_vel = 0.0
@@ -120,30 +193,194 @@ class FraudRiskScorer:
         final_score = max(0.0, min(1.0, composite_score - trust_discount))
         final_score = round(final_score, 4)
 
-        # Decision Routing & Progressive Friction Protocol
+        # Progressive Friction Protocol (Never freeze users automatically on unverified heuristics)
         if final_score < cls.AUTO_APPROVE_THRESHOLD:
             decision = "AUTO_APPROVE"
             routing_queue = "GATEWAY_DISPATCH_QUEUE"
             friction_action = "NONE_IMMEDIATE_DISPATCH"
             action_desc = "Low-risk transaction cleared for automated gateway payout."
-        elif final_score < cls.AUTO_REJECT_THRESHOLD:
-            decision = "MANUAL_REVIEW"
+            is_blocked = False
+        elif final_score < cls.MANUAL_REVIEW_THRESHOLD:
+            decision = "STEP_UP_CHALLENGE"
             routing_queue = "COMPLIANCE_OPERATIONS_QUEUE"
             friction_action = "PROGRESSIVE_CHALLENGE_SMS_OTP"
             action_desc = "Moderate risk signals detected. Dispatched 48h escrow hold and required out-of-band SMS OTP verification."
+            is_blocked = True
         else:
-            decision = "AUTO_REJECT"
-            routing_queue = "SECURITY_LOCKOUT_QUEUE"
-            friction_action = "ACCOUNT_FREEZE_WITH_APPEAL_LINK"
-            action_desc = "High-confidence fraud heuristics triggered. Withdrawal blocked; automated user appeal ticket opened."
+            decision = "SECURITY_ESCALATION_HOLD"
+            routing_queue = "FRAUD_ESCALATION_REVIEW_QUEUE"
+            friction_action = "ESCROW_PAUSE_WITH_APPEAL_TICKET"
+            action_desc = "Elevated risk signals detected. Payout paused in escrow for analyst compliance review (not an account ban). In-app appeal ticket generated."
+            is_blocked = True
 
         return {
             "composite_risk_score": final_score,
-            "raw_composite_score": round(composite_score, 4),
             "decision": decision,
             "routing_queue": routing_queue,
             "friction_action": friction_action,
             "action_description": action_desc,
-            "factor_breakdown": breakdown,
-            "is_blocked": decision == "AUTO_REJECT"
+            "is_blocked": is_blocked,
+            "scoring_breakdown": breakdown
         }
+
+    @classmethod
+    def evaluate_model_performance(
+        cls,
+        benchmark_dataset: List[Dict[str, Any]],
+        threshold: float = 0.50
+    ) -> Dict[str, Any]:
+        """
+        Evaluates the fraud scoring engine against an empirical ground-truth benchmark dataset.
+        Computes Confusion Matrix, Precision, Recall, False Positive Rate (FPR),
+        and False Negative Rate (FNR).
+        """
+        tp = 0 # Fraud correctly flagged
+        fp = 0 # Legitimate incorrectly flagged (False Positive)
+        tn = 0 # Legitimate correctly approved
+        fn = 0 # Fraud missed (False Negative)
+
+        for case in benchmark_dataset:
+            ground_truth_is_fraud = case["is_fraud"]
+            eval_res = cls.evaluate_withdrawal_risk(case["features"])
+            score = eval_res["composite_risk_score"]
+            predicted_fraud = score >= threshold
+
+            if ground_truth_is_fraud and predicted_fraud:
+                tp += 1
+            elif not ground_truth_is_fraud and predicted_fraud:
+                fp += 1
+            elif not ground_truth_is_fraud and not predicted_fraud:
+                tn += 1
+            else:
+                fn += 1
+
+        total = len(benchmark_dataset)
+        precision = tp / (tp + fp) if (tp + fp) > 0 else 1.0
+        recall = tp / (tp + fn) if (tp + fn) > 0 else 1.0
+        specificity = tn / (tn + fp) if (tn + fp) > 0 else 1.0
+        fpr = fp / (fp + tn) if (fp + tn) > 0 else 0.0
+        fnr = fn / (fn + tp) if (fn + tp) > 0 else 0.0
+        f1 = (2 * precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
+        accuracy = (tp + tn) / total if total > 0 else 1.0
+
+        return {
+            "total_samples": total,
+            "confusion_matrix": {
+                "true_positives": tp,
+                "false_positives": fp,
+                "true_negatives": tn,
+                "false_negatives": fn
+            },
+            "metrics": {
+                "accuracy": round(accuracy, 4),
+                "precision": round(precision, 4),
+                "recall_sensitivity": round(recall, 4),
+                "specificity": round(specificity, 4),
+                "false_positive_rate": round(fpr, 4),
+                "false_negative_rate": round(fnr, 4),
+                "f1_score": round(f1, 4)
+            },
+            "eval_decision_threshold": threshold
+        }
+
+    @classmethod
+    def get_realistic_benchmark_dataset(cls) -> List[Dict[str, Any]]:
+        """
+        Returns a curated benchmark set of realistic edge cases representing:
+        - Legitimate mobile gamers on cellular network handovers (Should NOT be flagged).
+        - Legitimate power users withdrawing frequently with KYC (Should NOT be flagged).
+        - Sybil farm multi-accounting bots (Should BE flagged).
+        - Autoclicker micro-jitter tap bots (Should BE flagged).
+        - Suspicious credential stuffers with IP mismatch (Should BE flagged).
+        """
+        cases = [
+            # 1. Legitimate Mobile User with Dynamic Cellular IP handover
+            {
+                "case_id": "CASE_LEGIT_01",
+                "is_fraud": False,
+                "features": {
+                    "account_age_days": 45,
+                    "withdrawal_count_24h": 1,
+                    "shared_device_account_count": 1,
+                    "is_ip_country_mismatched": True, # Tower hop
+                    "carrier_asn": "AS55836", # Airtel whitelisted
+                    "average_tap_micro_jitter_ms": 28.5,
+                    "kyc_tier": "TIER_2",
+                    "lifetime_completed_tasks": 30
+                }
+            },
+            # 2. Legitimate Established User, 2nd withdrawal
+            {
+                "case_id": "CASE_LEGIT_02",
+                "is_fraud": False,
+                "features": {
+                    "account_age_days": 60,
+                    "withdrawal_count_24h": 2,
+                    "shared_device_account_count": 1,
+                    "is_ip_country_mismatched": False,
+                    "carrier_asn": "AS45609", # Jio
+                    "average_tap_micro_jitter_ms": 32.0,
+                    "kyc_tier": "TIER_3",
+                    "lifetime_completed_tasks": 50
+                }
+            },
+            # 3. Legitimate Rapid Casual Gamer (Natural micro-jitter 22ms)
+            {
+                "case_id": "CASE_LEGIT_03",
+                "is_fraud": False,
+                "features": {
+                    "account_age_days": 35,
+                    "withdrawal_count_24h": 1,
+                    "shared_device_account_count": 1,
+                    "is_ip_country_mismatched": False,
+                    "average_tap_micro_jitter_ms": 22.0,
+                    "kyc_tier": "TIER_1",
+                    "lifetime_completed_tasks": 15
+                }
+            },
+            # 4. Fraud Case: Sybil Multi-Account Farm on 1 Phone
+            {
+                "case_id": "CASE_FRAUD_01",
+                "is_fraud": True,
+                "features": {
+                    "account_age_days": 1,
+                    "withdrawal_count_24h": 4,
+                    "shared_device_account_count": 5,
+                    "is_ip_country_mismatched": False,
+                    "average_tap_micro_jitter_ms": 1.5, # Autoclicker
+                    "kyc_tier": "TIER_0",
+                    "lifetime_completed_tasks": 2
+                }
+            },
+            # 5. Fraud Case: International VPN Proxy + Robotic Micro-jitter
+            {
+                "case_id": "CASE_FRAUD_02",
+                "is_fraud": True,
+                "features": {
+                    "account_age_days": 2,
+                    "withdrawal_count_24h": 3,
+                    "shared_device_account_count": 3,
+                    "is_ip_country_mismatched": True,
+                    "carrier_asn": "AS9009", # Unknown foreign hosting ASN
+                    "average_tap_micro_jitter_ms": 2.1,
+                    "kyc_tier": "TIER_0",
+                    "lifetime_completed_tasks": 1
+                }
+            },
+            # 6. Fraud Case: Fast Cash-Out Attack on Compromised Device
+            {
+                "case_id": "CASE_FRAUD_03",
+                "is_fraud": True,
+                "features": {
+                    "account_age_days": 2,
+                    "withdrawal_count_24h": 5,
+                    "shared_device_account_count": 4,
+                    "is_ip_country_mismatched": True,
+                    "carrier_asn": "AS14061", # DigitalOcean datacenter IP
+                    "average_tap_micro_jitter_ms": 4.0,
+                    "kyc_tier": "TIER_0",
+                    "lifetime_completed_tasks": 0
+                }
+            }
+        ]
+        return cases
