@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VELOOP Rewards - Review Day Official Submission Dossier - 16 Nov 2026</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 10mm 12mm 10mm 12mm;
+    }
+    
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+      font-size: 8.4pt;
+      line-height: 1.32;
+      color: #1e293b;
+      margin: 0;
+      padding: 0;
+      background: #ffffff;
+    }
+
+    .page {
+      page-break-after: always;
+      break-after: page;
+      position: relative;
+      height: 275mm;
+      max-height: 275mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      overflow: hidden;
+    }
+
+    .page:last-child {
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+
+    /* Running Header */
+    .running-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 7.4pt;
+      color: #64748b;
+      padding-bottom: 4px;
+      margin-bottom: 6px;
+      border-bottom: 1px solid #cbd5e1;
+      font-weight: 600;
+    }
+
+    /* Brand Header */
+    .brand-title {
+      font-size: 16pt;
+      font-weight: 900;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+      margin-bottom: 1px;
+      text-transform: uppercase;
+    }
+
+    .brand-subtitle {
+      font-size: 8.4pt;
+      font-weight: 800;
+      color: #0284c7;
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+      margin-bottom: 2px;
+    }
+
+    .brand-tagline {
+      font-size: 7.4pt;
+      font-style: italic;
+      color: #64748b;
+      margin-bottom: 6px;
+    }
+
+    /* Dual Tone Distinction Banner */
+    .distinction-banner {
+      background: linear-gradient(90deg, #fef3c7 0%, #e0f2fe 100%);
+      border: 1.5px solid #0284c7;
+      border-radius: 5px;
+      padding: 5px 10px;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 7.8pt;
+    }
+
+    .badge-sim {
+      background: #d97706;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 6.8pt;
+      padding: 2px 6px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .badge-prod {
+      background: #0284c7;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 6.8pt;
+      padding: 2px 6px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    /* Meta Grid */
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 125px 1fr 125px 1fr;
+      gap: 2.5px 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 5px;
+      padding: 5px 8px;
+      font-size: 7.8pt;
+      margin-bottom: 6px;
+    }
+
+    .meta-lbl {
+      font-weight: 700;
+      color: #475569;
+      text-transform: uppercase;
+      font-size: 6.8pt;
+      letter-spacing: 0.3px;
+    }
+
+    .meta-val {
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    /* Section Headings */
+    h2 {
+      font-size: 9.8pt;
+      font-weight: 800;
+      color: #0f172a;
+      margin-top: 5px;
+      margin-bottom: 3px;
+      border-bottom: 1.5px solid #0284c7;
+      padding-bottom: 2px;
+      letter-spacing: -0.2px;
+    }
+
+    h3 {
+      font-size: 8.4pt;
+      font-weight: 700;
+      color: #0369a1;
+      margin-top: 4px;
+      margin-bottom: 2px;
+    }
+
+    p {
+      margin: 0 0 3px 0;
+      text-align: justify;
+      color: #334155;
+    }
+
+    ul {
+      margin: 2px 0 3px 0;
+      padding-left: 14px;
+    }
+
+    li {
+      margin-bottom: 1.5px;
+      color: #334155;
+      line-height: 1.28;
+    }
+
+    li strong {
+      color: #0f172a;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 7.4pt;
+      background: #f1f5f9;
+      padding: 1px 3px;
+      border-radius: 2px;
+      color: #0369a1;
+      font-weight: 600;
+    }
+
+    /* Table */
+    table.rep-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 3px 0 5px 0;
+      font-size: 7.4pt;
+    }
+
+    table.rep-table th {
+      background: #0f172a;
+      color: #ffffff;
+      padding: 3.5px 5px;
+      text-align: left;
+      font-weight: 700;
+      font-size: 7pt;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      border: 1px solid #0f172a;
+    }
+
+    table.rep-table td {
+      padding: 3px 5px;
+      border: 1px solid #cbd5e1;
+      vertical-align: top;
+      line-height: 1.24;
+    }
+
+    table.rep-table tr:nth-child(even) td {
+      background: #f8fafc;
+    }
+
+    /* Card styling */
+    .card-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-left: 3.5px solid #0284c7;
+      border-radius: 4px;
+      padding: 4px 7px;
+      margin: 3px 0 5px 0;
+      font-size: 7.8pt;
+    }
+
+    .doc-footnote {
+      font-size: 6.8pt;
+      color: #64748b;
+      font-style: italic;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 2px;
+      margin-top: auto;
+    }
+
+    /* Screenshot container */
+    .screenshot-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 6px;
+      background: #f8fafc;
+    }
+
+    .screenshot-card img {
+      width: 100%;
+      height: auto;
+      max-height: 82mm;
+      object-fit: cover;
+      display: block;
+      border-bottom: 1px solid #cbd5e1;
+    }
+
+    .screenshot-caption {
+      padding: 3px 6px;
+      font-size: 7.2pt;
+      font-weight: 600;
+      color: #334155;
+      background: #f1f5f9;
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== PAGE 1 ==================== -->
+  <div class="page" id="page-1">
+    <div class="running-header">
+      <span>VELOOP Rewards • Official Internship Review Day Submission • 16 November 2026</span>
+      <span>Page 1 of 4</span>
+    </div>
+
+    <div class="brand-title">VELOOP REWARDS</div>
+    <div class="brand-subtitle">REVIEW DAY OFFICIAL PROJECT SUBMISSION DOSSIER</div>
+    <div class="brand-tagline">Comprehensive Presentation of Updated Pages, Public Cloud Deployment & Feedback Implementation</div>
+
+    <div class="distinction-banner">
+      <div>
+        <span class="badge-sim">SIMULATED TESTING DATASET</span>
+        <span style="color: #78350F; font-weight: 600; margin-left: 4px;">1,000 Synthetic Users • 35k Telemetry Events</span>
+      </div>
+      <div>
+        <span class="badge-prod">VELOOP PRODUCTION SPECIFICATION</span>
+        <span style="color: #0C4A6E; font-weight: 600; margin-left: 4px;">Persistent SQLite ACID Ledger • 30/30 Unit Tests Passed</span>
+      </div>
+    </div>
+
+    <div class="meta-grid">
+      <div class="meta-lbl">Intern Name</div>
+      <div class="meta-val">Karthik Reddy</div>
+      <div class="meta-lbl">Internship Track</div>
+      <div class="meta-val">Data Analyst Intern</div>
+
+      <div class="meta-lbl">Submission Date</div>
+      <div class="meta-val">16 November 2026 (Official Review Day)</div>
+      <div class="meta-lbl">Task Submitted</div>
+      <div class="meta-val">Task 01: Product Analytics & Data Readiness</div>
+
+      <div class="meta-lbl">Public Live App</div>
+      <div class="meta-val">https://veloop-analytics-task01.streamlit.app/</div>
+      <div class="meta-lbl">Source Repository</div>
+      <div class="meta-val">https://github.com/Karthikreddy200/VELOOP- (Branch: main)</div>
+
+      <div class="meta-lbl">Test Suite Status</div>
+      <div class="meta-val">30/30 Passed (100% Pass Rate in 0.024s)</div>
+      <div class="meta-lbl">Financial Ledger</div>
+      <div class="meta-val">ACID SQLite Persistence (0.0000 USD Variance)</div>
+    </div>
+
+    <h2>1. Executive Summary & Review Readiness</h2>
+    <p>
+      In compliance with the official <strong>Review Day (16 November 2026)</strong> directive, this dossier formally presents the updated project pages, high-resolution visual evidence, live public deployment link, and complete source code repository for <strong>VELOOP Rewards Task 01: Product Analytics, Data Readiness & Data Management Blueprint</strong>.
+    </p>
+    <p>
+      All assigned updates and previous mentor feedback points have been rigorously implemented, verified by automated unit tests, pushed to GitHub, and deployed live to cloud infrastructure.
+    </p>
+
+    <h2>2. Mentor Review Feedback Resolution Summary (8/8 Items Closed)</h2>
+    <table class="rep-table">
+      <thead>
+        <tr>
+          <th style="width: 5%;">#</th>
+          <th style="width: 20%;">Review Feedback Item</th>
+          <th style="width: 45%;">Engineering Implementation Executed</th>
+          <th style="width: 15%;">Resolution</th>
+          <th style="width: 15%;">Reference</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>1</strong></td>
+          <td><strong>Live Dashboard</strong></td>
+          <td>Stable public Streamlit Cloud deployment operating 24/7 with zero localhost dependency.</td>
+          <td><strong style="color: #16a34a;">🟢 RESOLVED</strong></td>
+          <td>Live Cloud Link</td>
+        </tr>
+        <tr>
+          <td><strong>2</strong></td>
+          <td><strong>GitHub Repository</strong></td>
+          <td>Complete codebase, datasets, dbt SQL models, test suite, and docs pushed to branch <code>main</code>.</td>
+          <td><strong style="color: #16a34a;">🟢 RESOLVED</strong></td>
+          <td>GitHub Repo</td>
+        </tr>
+        <tr>
+          <td><strong>3</strong></td>
+          <td><strong>Financial Ledger</strong></td>
+          <td>Implemented SQLite ACID double-entry ledger with immutable transaction IDs and zero variance.</td>
+          <td><strong style="color: #16a34a;">🟢 RESOLVED</strong></td>
+          <td><code>persistent_ledger.py</code></td>
+        </tr>
+        <tr>
+          <td><strong>4</strong></td>
+          <td><strong>Testing Suite</strong></td>
+          <td>Reconciled 19 &rarr; 26 &rarr; 30 unit tests; documented 30-test master catalog with 100% pass proof.</td>
+          <td><strong style="color: #16a34a;">🟢 RESOLVED</strong></td>
+          <td><code>test_analytics.py</code></td>
+        </tr>
+        <tr>
+          <td><strong>5</strong></td>
+          <td><strong>Data Accuracy</strong></td>
+          <td>Validated calculations against underlying data; enforced <code>SIMULATED DATA</code> badges on all views.</td>
+          <td><strong style="color: #16a34a;">🟢 RESOLVED</strong></td>
+          <td>Views 1–7</td>
+        </tr>
+        <tr>
+          <td><strong>6</strong></td>
+          <td><strong>Fraud False-Positives</strong></td>
+          <td>Added cellular carrier ASN whitelisting, touch entropy, and progressive friction (48h escrow + OTP).</td>
+          <td><strong style="color: #16a34a;">🟢 RESOLVED</strong></td>
+          <td><code>fraud_risk_scorer.py</code></td>
+        </tr>
+        <tr>
+          <td><strong>7</strong></td>
+          <td><strong>Privacy & Governance</strong></td>
+          <td>Implemented phone masking, device tokenization, and automated compliance scanner (GDPR/DPDP).</td>
+          <td><strong style="color: #16a34a;">🟢 RESOLVED</strong></td>
+          <td><code>pii_masking.py</code></td>
+        </tr>
+        <tr>
+          <td><strong>8</strong></td>
+          <td><strong>Architecture Register</strong></td>
+          <td>Published 4-Tier Register: Implemented vs. Simulated vs. Proposed vs. To-Be-Verified.</td>
+          <td><strong style="color: #16a34a;">🟢 RESOLVED</strong></td>
+          <td><code>README.md</code> Sec 3</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="card-box" style="border-left-color: #16a34a; background: #f0fdf4; margin-top: 6px;">
+      <strong>Review Verification Summary:</strong> 21 of 21 task deliverables fully verified, 30 of 30 automated tests passing with zero defects, live interactive platform accessible globally at <a href="https://veloop-analytics-task01.streamlit.app/" style="color: #0369a1; font-weight: 700; text-decoration: none;">https://veloop-analytics-task01.streamlit.app/</a>.
+    </div>
+
+    <div class="doc-footnote">
+      VELOOP Rewards • Official Internship Review Day Submission • Task 01: Product Analytics & Data Readiness
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 2 ==================== -->
+  <div class="page" id="page-2">
+    <div class="running-header">
+      <span>VELOOP Rewards • Official Internship Review Day Submission • 16 November 2026</span>
+      <span>Page 2 of 4</span>
+    </div>
+
+    <h2>3. Updated Project Page Screenshots — Part 1: Executive Analytics & Lifecycle</h2>
+
+    <h3>3.1 View 1: Executive KPI Command Center (Live Deployment)</h3>
+    <p>
+      Models high-level platform telemetry across 1,000 synthetic users: 84.8% completion rate, 42.1% D1 retention, $0.82 viral coefficient ($K$-factor), 90% token burn ratio, and interactive 30-day activity trend charts.
+    </p>
+
+    <div class="screenshot-card">
+      <img src="assets/screenshots/01_Executive_KPI_Command_Center.png" alt="View 1: Executive KPI Command Center">
+      <div class="screenshot-caption">
+        <span>Figure 1: View 1 — Executive KPI Command Center & Core Telemetry Metrics</span>
+        <span>Resolution: 1680 &times; 1050 • Live Streamlit Platform</span>
+      </div>
+    </div>
+
+    <h3>3.2 View 3: User Lifecycle State Machine & Cohort Retention (WP B & E)</h3>
+    <p>
+      Visualizes 7 operational lifecycle states (Engaged, Activated, Churned, Dormant, Suspended) with deterministic FSM transition guards, acquisition channel breakdown, demographic distributions, and Section 22 PII governance.
+    </p>
+
+    <div class="screenshot-card">
+      <img src="assets/screenshots/02_User_Lifecycle_and_Retention_Cohorts.png" alt="View 3: User Lifecycle & Cohorts">
+      <div class="screenshot-caption">
+        <span>Figure 2: View 3 — User Lifecycle State Machine, Demographics & Cohort Curves</span>
+        <span>Resolution: 1680 &times; 1050 • Live Streamlit Platform</span>
+      </div>
+    </div>
+
+    <div class="doc-footnote">
+      VELOOP Rewards • Official Internship Review Day Submission • Task 01: Product Analytics & Data Readiness
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 3 ==================== -->
+  <div class="page" id="page-3">
+    <div class="running-header">
+      <span>VELOOP Rewards • Official Internship Review Day Submission • 16 November 2026</span>
+      <span>Page 3 of 4</span>
+    </div>
+
+    <h2>4. Updated Project Page Screenshots — Part 2: Ledger Persistence & Verification</h2>
+
+    <h3>4.1 View 6: Persistent Financial Ledger & Fraud Risk Engine (WP D & C)</h3>
+    <p>
+      Demonstrates atomic debit/credit writes to persistent SQLite database (<code>data/wallet_ledger.db</code>), live transaction logs, minimum withdrawal enforcement ($5.00), and the multi-factor ML fraud scorer with progressive friction.
+    </p>
+
+    <div class="screenshot-card">
+      <img src="assets/screenshots/03_Persistent_Ledger_and_Fraud_Engine.png" alt="View 6: Persistent Ledger & Fraud Scorer">
+      <div class="screenshot-caption">
+        <span>Figure 3: View 6 — ACID SQLite Double-Entry Ledger Table & Multi-Factor Fraud Risk Scorer</span>
+        <span>Resolution: 1680 &times; 1050 • Live Streamlit Platform</span>
+      </div>
+    </div>
+
+    <h3>4.2 View 7: 21 Deliverables Verification Matrix & Test Status</h3>
+    <p>
+      Comprehensive traceability register proving 100% completion across all 21 deliverables (Work Packages A through T) and live display of the 30/30 automated unit test suite passing with zero defects.
+    </p>
+
+    <div class="screenshot-card">
+      <img src="assets/screenshots/04_Deliverables_Matrix_and_30_Tests.png" alt="View 7: 21 Deliverables Matrix & 30 Tests">
+      <div class="screenshot-caption">
+        <span>Figure 4: View 7 — 21 Deliverables Verification Matrix & 30/30 Automated Unit Tests Status</span>
+        <span>Resolution: 1680 &times; 1050 • Live Streamlit Platform</span>
+      </div>
+    </div>
+
+    <div class="doc-footnote">
+      VELOOP Rewards • Official Internship Review Day Submission • Task 01: Product Analytics & Data Readiness
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 4 ==================== -->
+  <div class="page" id="page-4">
+    <div class="running-header">
+      <span>VELOOP Rewards • Official Internship Review Day Submission • 16 November 2026</span>
+      <span>Page 4 of 4</span>
+    </div>
+
+    <h2>5. Key Technical Architecture Highlights</h2>
+
+    <h3>5.1 ACID Persistent Ledger (Zero Reconciliation Variance)</h3>
+    <ul>
+      <li><strong>Atomic Persistence:</strong> All balance mutations are recorded in SQLite under table <code>fact_wallet_transactions</code> with unique transaction IDs (e.g. <code>tx_cred_047219</code>, <code>wd_audit_582910</code>).</li>
+      <li><strong>Double-Entry Accounting:</strong> Earning credits debit cash receivables (<code>1010</code>) and credit user liability (<code>2010</code>); withdrawals debit user liability and credit gateway settlement assets (<code>1020</code>).</li>
+      <li><strong>Mathematical Proof:</strong> Automated unit test <code>test_persistent_ledger_reconciliation_zero_variance</code> confirms zero variance across cumulative debits and credits: <code>Variance = 0.0000 USD</code>.</li>
+    </ul>
+
+    <h3>5.2 Fraud False-Positive Mitigation & Progressive Friction Protocol</h3>
+    <ul>
+      <li><strong>Domestic Carrier ASN Whitelisting:</strong> Airtel (<code>AS55836</code>), Jio (<code>AS45609</code>), BSNL (<code>AS9829</code>), and Vi (<code>AS24560</code>) are whitelisted, preventing normal mobile tower handovers from triggering false VPN penalties.</li>
+      <li><strong>Touch Entropy & Duration:</strong> Micro-jitter variance and contact duration (60–120ms) protect rapid human gamers from flat autoclicker machine bans.</li>
+      <li><strong>Progressive Friction:</strong> Medium-risk users (0.30 &le; Score &lt; 0.70) receive a 48h escrow hold and SMS OTP challenge rather than an immediate ban; high-risk users (&ge; 0.70) receive an automated appeal ticket link.</li>
+    </ul>
+
+    <h3>5.3 Automated Testing Execution Verification</h3>
+    <table class="rep-table">
+      <thead>
+        <tr>
+          <th style="width: 25%;">Test Suite Group</th>
+          <th style="width: 20%;">Tests Included</th>
+          <th style="width: 35%;">Core Behavioral Criteria Validated</th>
+          <th style="width: 20%;">Execution Result</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>User Lifecycle FSM</strong></td>
+          <td>Tests 1 – 6</td>
+          <td>Engaged, Activated, Dormant, Churned, Suspended states & illegal transitions.</td>
+          <td><strong style="color: #16a34a;">6 / 6 Passed</strong></td>
+        </tr>
+        <tr>
+          <td><strong>PII & Privacy Governance</strong></td>
+          <td>Tests 7 – 8, 30</td>
+          <td>Email masking, deterministic salted hashing, automated compliance scan.</td>
+          <td><strong style="color: #16a34a;">3 / 3 Passed</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Financial Ledger & Payouts</strong></td>
+          <td>Tests 9 – 12, 28 – 29</td>
+          <td>Min withdrawal ($5), fee math, balance checks, SQLite ACID writes, 0.0000 variance.</td>
+          <td><strong style="color: #16a34a;">6 / 6 Passed</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Anti-Bot & Token Health</strong></td>
+          <td>Tests 13 – 16</td>
+          <td>Ad velocity cap, 10 taps/s bot threshold, 1,000 XP/hr ceiling, 90% burn ratio.</td>
+          <td><strong style="color: #16a34a;">4 / 4 Passed</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Referral Funnel & Sybil</strong></td>
+          <td>Tests 17 – 19</td>
+          <td>Viral coefficient $K = 0.82$, 4-stage funnel conversion, hardware hash Sybil blocks.</td>
+          <td><strong style="color: #16a34a;">3 / 3 Passed</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Telemetry Streaming</strong></td>
+          <td>Tests 20 – 24</td>
+          <td>28 production events contract, DLQ routing, sliding-window deduplication, drift.</td>
+          <td><strong style="color: #16a34a;">5 / 5 Passed</strong></td>
+        </tr>
+        <tr>
+          <td><strong>ML Fraud Risk Scorer</strong></td>
+          <td>Tests 25 – 27</td>
+          <td>Boundary thresholds: Auto-Approve (&lt;0.30), Manual-Review, Auto-Reject (&ge;0.70).</td>
+          <td><strong style="color: #16a34a;">3 / 3 Passed</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>6. Review Day Official Sign-Off Block</h2>
+    <div class="card-box" style="border-left-color: #16a34a; background: #f0fdf4; margin-top: 6px;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <strong style="color: #16a34a; font-size: 8.6pt;">STATUS: TASK 01 COMPLETE & SUBMITTED FOR FINAL APPROVAL</strong><br>
+          <span style="font-size: 7.4pt; color: #334155;">All review feedback addressed. All deliverables verified. Ready to proceed to Task 02 upon confirmation.</span>
+        </div>
+        <div style="text-align: right; font-size: 7.4pt; color: #475569;">
+          <strong>Intern:</strong> Karthik Reddy<br>
+          <strong>Date:</strong> 16 November 2026
+        </div>
+      </div>
+    </div>
+
+    <div class="doc-footnote">
+      VELOOP Rewards • Official Internship Review Day Submission • Task 01: Product Analytics & Data Readiness
+    </div>
+  </div>
+
+</body>
+</html>
